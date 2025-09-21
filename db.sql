@@ -1,0 +1,12 @@
+CREATE DATABASE IF NOT EXISTS comandas
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE comandas;
+
+
+CREATE TABLE mesas (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    estado VARCHAR(50) NOT NULL
+);
+
