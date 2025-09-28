@@ -7,8 +7,8 @@ function addToList(btn) {
   const nombre = card.getAttribute("data-nombre");
   const precio = parseFloat(card.getAttribute("data-precio"));
 
-  const platoExistente = platosElegidos.find(p => p.nombre === nombre);
-
+  const platoExistente = platosElegidos.find(p => p.id === idPlato);
+console.log(platoExistente);
   if (platoExistente) {
     platoExistente.cantidad += 1;
   } else {

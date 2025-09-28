@@ -1,6 +1,7 @@
 <?php
 // Función para crear popup
-function createPopup($title, $content) {
+function createPopup($title, $content)
+{
     return "
     <div class='popup-overlay' onclick='closePopup(event)'>
         <div class='popup' onclick='event.stopPropagation()'>
@@ -12,13 +13,21 @@ function createPopup($title, $content) {
 }
 
 // Función para renderizar cards de tipos de platos o platos
-function renderItemList($items, $type = 'default', $conn = null) {
+function renderItemList($items, $type = 'default', $conn = null)
+{
     $html = "<div class='card-grid'>";
 
     foreach ($items as $item) {
-        $id = $item['id_tipo'] ?? $item['id_plato'] ?? null;
-        $nombre = $item['nombre_tipo'] ?? $item['nombre_plato'] ?? 'Sin nombre';
-        $imagen = $item['imagen_tipo'] ?? $item['imagen_plato'] ?? null;
+        if ($type == "tipos") {
+            $id = $item['id_tipo'];
+            $nombre = $item['nombre_tipo'];
+            $imagen = $item['imagen_tipo'];
+        } else if ($type == "platos") {
+            $id = $item['id_plato'];
+            $nombre = $item['nombre_plato'];
+            $imagen = $item['imagen_plato'];
+        }
+        
         $alergenosAttr = !empty($item['alergenos']) ? htmlspecialchars($item['alergenos'], ENT_QUOTES) : '[]';
         $precio = $item['precio'] ?? 0.0;
 
@@ -71,4 +80,3 @@ function renderItemList($items, $type = 'default', $conn = null) {
     $html .= "</div>";
     return $html;
 }
-?>
