@@ -35,7 +35,7 @@ function openLista() {
   if (platosElegidos.length > 0) {
     content = "<table>";
     content +=
-      "<thead><tr><th>Sumar precio al total</th><th>Plato</th><th>Cantidad</th><th>Precio por unidad</th><th>Eliminar</th></tr></thead><tbody>";
+      "<thead><tr><th>Sumar precio al total</th><th>Plato</th><th>Cantidad</th><th>Precio</th><th>Eliminar</th></tr></thead><tbody>";
 
     platosElegidos.forEach((p) => {
       const checkedAttr = p.incluido ? "checked" : "";
