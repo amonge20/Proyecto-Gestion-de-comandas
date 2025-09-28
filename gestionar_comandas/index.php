@@ -1,5 +1,5 @@
 <?php
-include 'conexion.php';
+include '../conexion.php';
 
 $sql = "SELECT * FROM comandas ORDER BY fecha ASC";
 $result = $conn->query($sql);

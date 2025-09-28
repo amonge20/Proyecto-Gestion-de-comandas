@@ -1,5 +1,5 @@
 <?php
-include 'conexion.php'; // tu conexión a la base de datos
+include '../conexion.php'; // tu conexión a la base de datos
 
 // Recibir JSON
 $data = json_decode(file_get_contents('php://input'), true);

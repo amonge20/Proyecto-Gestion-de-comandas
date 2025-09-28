@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+require_once '../conexion.php';
 require_once 'funciones.php';
 
 $idTipo = intval($_GET['id_tipo'] ?? 0);
