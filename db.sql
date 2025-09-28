@@ -72,7 +72,7 @@ CREATE TABLE comandas (
     id_comanda INT PRIMARY KEY AUTO_INCREMENT,
     id_mesa INT,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    total DECIMAL(10,2) DEFAULT 0.00,
+    precio_total DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (id_mesa) REFERENCES mesas(id_mesa)
 );
 

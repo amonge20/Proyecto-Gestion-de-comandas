@@ -19,7 +19,7 @@ foreach ($platos as $p) {
 }
 
 // Insertar comanda
-$stmt = $conn->prepare("INSERT INTO comandas (total, id_mesa) VALUES (?,?)");
+$stmt = $conn->prepare("INSERT INTO comandas (precio_total, id_mesa) VALUES (?,?)");
 $stmt->bind_param("di", $total, $_SESSION["id_mesa"]);
 $stmt->execute();
 $id_comanda = $stmt->insert_id;
