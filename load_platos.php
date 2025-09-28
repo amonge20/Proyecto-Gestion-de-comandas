@@ -16,11 +16,11 @@ if ($resultAlergenos && $resultAlergenos->num_rows > 0) {
         $content .= "<label><input type='checkbox' class='filtro-alergeno' value='{$row['id_alergeno']}' onchange='filtrarPlatos()'> {$row['nombre_alergeno']}</label><br>";
     }
     $content .= "</div>";
-    $content .= "<button onclick='limpiarFiltro()' class='btn-clear'>Limpiar</button>";
+    $content .= "<button onclick='limpiarFiltro()' class='btn-clear'>Limpiar filtro</button>";
 }
 
 $content .= "</div>";
 $content .= "<div id='listaPlatos'>" . renderItemList($platos, 'platos', $conn) . "</div>";
 
-echo createPopup("Platos de este tipo", $content);
+echo createPopup($_GET["nombre_tipo"], $content);
 ?>

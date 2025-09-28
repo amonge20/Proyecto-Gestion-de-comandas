@@ -1,11 +1,11 @@
 <?php
 include 'conexion.php';
 
-$sql = "SELECT * FROM comandas ORDER BY fecha DESC";
+$sql = "SELECT * FROM comandas ORDER BY fecha ASC";
 $result = $conn->query($sql);
 
 while ($comanda = $result->fetch_assoc()) {
-    echo "<h3>Comanda ID {$comanda['id_comanda']} - Total: {$comanda['total']} € - Fecha: {$comanda['fecha']}</h3>";
+    echo "<h3>Comanda ID {$comanda['id_comanda']} - Total: {$comanda['total']} € - Mesa: {$comanda['id_mesa']} - Fecha: {$comanda['fecha']}</h3>";
 
     $sql2 = "SELECT cp.cantidad, cp.precio, p.nombre_plato 
              FROM comanda_platos cp

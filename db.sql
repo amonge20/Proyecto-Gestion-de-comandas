@@ -70,8 +70,10 @@ INSERT INTO platos (nombre_plato, descripcion, id_tipo, alergenos, imagen_plato,
 -- Tabla de comandas
 CREATE TABLE comandas (
     id_comanda INT PRIMARY KEY AUTO_INCREMENT,
+    id_mesa INT,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    total DECIMAL(10,2) DEFAULT 0.00
+    total DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (id_mesa) REFERENCES mesas(id_mesa)
 );
 
 -- Tabla de platos en cada comanda

@@ -4,6 +4,15 @@ require_once 'funciones.php';
 
 $query = $conn->query("SELECT * FROM tipos_platos");
 $tipos = $query->fetch_all(MYSQLI_ASSOC);
+
+// Si viene id_mesa por POST, actualizamos la sesión
+if (isset($_POST['id_mesa'])) {
+    $_SESSION['id_mesa'] = (int)$_POST['id_mesa'];
+    echo 'Mesa ' . $_SESSION['id_mesa'];
+    exit; // Para que no siga ejecutando el resto si solo es un fetch
+} else {
+    $_SESSION["id_mesa"] = intval($_GET['id_mesa'] ?? 1);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -16,22 +25,10 @@ $tipos = $query->fetch_all(MYSQLI_ASSOC);
 </head>
 
 <body>
+    <header>Mesa <input type="number" name="id_mesa" id="id_mesa" min="1" max="30" value="<?php echo $_SESSION["id_mesa"] ?>" oninput="cambiarNumMesa(this)"></header>
     <h1>Tipos de Platos</h1>
     <?php echo renderItemList($tipos, 'tipos'); ?>
-    <button id="btnLista" onclick="openLista()" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 12px 20px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    z-index: 1001;
-">Ver lista de platos</button>
-
-
+    <button id="btnLista" onclick="openLista()">Ver platos elegidos</button>
 </body>
 
 </html>

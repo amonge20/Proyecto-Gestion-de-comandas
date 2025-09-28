@@ -19,17 +19,17 @@ foreach ($platos as $p) {
 }
 
 // Insertar comanda
-$stmt = $conn->prepare("INSERT INTO comandas (total) VALUES (?)");
-$stmt->bind_param("d", $total);
+$stmt = $conn->prepare("INSERT INTO comandas (total, id_mesa) VALUES (?,?)");
+$stmt->bind_param("di", $total, $_SESSION["id_mesa"]);
 $stmt->execute();
 $id_comanda = $stmt->insert_id;
 
 // Insertar platos
-$stmt2 = $conn->prepare("INSERT INTO comanda_platos (id_comanda, id_plato, cantidad, incluido, precio) VALUES (?,?,?,?,?)");
+$stmt2 = $conn->prepare("INSERT INTO comanda_platos (id_comanda, id_plato, cantidad, precio) VALUES (?,?,?,?,?)");
 foreach ($platos as $p) {
-    $stmt2->bind_param("iiidi", $id_comanda, $p['id'], $p['cantidad'], $p['incluido'], $p['precio']);
+    $stmt2->bind_param("iiidi", $id_comanda, $p['id'], $p['cantidad'], $p['precio']);
     $stmt2->execute();
 }
 
-echo "Comanda guardada correctamente con ID: $id_comanda";
+echo "Comanda enviada correctamente";
 ?>
