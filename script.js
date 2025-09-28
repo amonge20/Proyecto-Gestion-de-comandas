@@ -35,7 +35,7 @@ function openLista() {
   if (platosElegidos.length > 0) {
     content = "<table>";
     content +=
-      "<thead><tr><th>Plato</th><th>Cantidad</th><th>Precio</th><th>Eliminar</th></tr></thead><tbody>";
+      "<thead><tr><th>Plato</th><th>Cantidad</th><th>Precio por unidad</th><th>Eliminar</th></tr></thead><tbody>";
     platosElegidos.forEach((p) => {
       content += `<tr data-uniqueid='${p.uniqueId}'>
             <td>${p.nombre}</td>
@@ -46,7 +46,7 @@ function openLista() {
         p.uniqueId
       }", this)' />
             </td>
-            <td>${(p.precio * p.cantidad).toFixed(2)} €</td>
+            <td>${p.precio.toFixed(2)} €</td>
             <td>
                 <button onclick='removeFromListById("${
                   p.uniqueId
