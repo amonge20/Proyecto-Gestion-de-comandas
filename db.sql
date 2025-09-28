@@ -78,10 +78,10 @@ CREATE TABLE comandas (
 
 -- Tabla de platos en cada comanda
 CREATE TABLE comanda_platos (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_comanda_plato INT PRIMARY KEY AUTO_INCREMENT,
     id_comanda INT,
     id_plato INT,
-    cantidad INT DEFAULT 1,
+    cantidad INT,
     precio DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (id_comanda) REFERENCES comandas(id_comanda),
     FOREIGN KEY (id_plato) REFERENCES platos(id_plato)

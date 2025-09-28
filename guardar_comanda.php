@@ -25,9 +25,9 @@ $stmt->execute();
 $id_comanda = $stmt->insert_id;
 
 // Insertar platos
-$stmt2 = $conn->prepare("INSERT INTO comanda_platos (id_comanda, id_plato, cantidad, precio) VALUES (?,?,?,?,?)");
+$stmt2 = $conn->prepare("INSERT INTO comanda_platos (id_comanda, id_plato, cantidad, precio) VALUES (?,?,?,?)");
 foreach ($platos as $p) {
-    $stmt2->bind_param("iiidi", $id_comanda, $p['id'], $p['cantidad'], $p['precio']);
+    $stmt2->bind_param("iiid", $id_comanda, $p['id'], $p['cantidad'], $p['precio']);
     $stmt2->execute();
 }
 
