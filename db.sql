@@ -19,7 +19,7 @@ INSERT INTO estados_mesa (nombre_estado) VALUES
 
 CREATE TABLE mesas (
     id_mesa INT PRIMARY KEY AUTO_INCREMENT,
-    id_estado INT DEFAULT 1,
+    id_estado INT,
     FOREIGN KEY (id_estado) REFERENCES estados_mesa(id_estado)
 );
 INSERT INTO mesas (id_estado) VALUES
