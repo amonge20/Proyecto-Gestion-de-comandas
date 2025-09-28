@@ -17,7 +17,7 @@ if (!empty($fase)) {
 <body>
     <h2>Elige una opción:</h2>
     <form method="get" action="index.php">
-        <button type="submit" name="fase" value="crear_comanda">Crear Comanda</button>
+        <button type="submit" name="fase" value="crear_comandas">Crear Comanda</button>
         <button type="submit" name="fase" value="gestionar_comandas">Gestionar Comandas</button>
     </form>
 </body>
