@@ -1,26 +1,29 @@
+-- Eliminar base de datos existente
 DROP DATABASE IF EXISTS comandas;
 
+-- Crear base de datos
 CREATE DATABASE IF NOT EXISTS comandas 
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
 USE comandas;
 
-CREATE TABLE mesas (
-    id_mesa INT PRIMARY KEY AUTO_INCREMENT,
-    estado VARCHAR(50) NOT NULL
+CREATE TABLE estados_mesa (
+    id_estado INT PRIMARY KEY AUTO_INCREMENT,
+    nombre_estado VARCHAR(50) NOT NULL
 );
 
--- Insertar varias mesas con su estado
-INSERT INTO mesas (estado) VALUES 
+INSERT INTO estados_mesa (nombre_estado) VALUES
 ('Disponible'),
-('Disponible'),
-('Disponible'),
-('Disponible'),
-('Disponible'),
-('Disponible'),
-('Disponible'),
-('Disponible');
+('Ocupada');
+
+CREATE TABLE mesas (
+    id_mesa INT PRIMARY KEY AUTO_INCREMENT,
+    id_estado INT DEFAULT 1,
+    FOREIGN KEY (id_estado) REFERENCES estados_mesa(id_estado)
+);
+INSERT INTO mesas (id_estado) VALUES
+(1),(1),(1),(1),(1),(1),(1),(1);
 
 CREATE TABLE tipos_platos (
     id_tipo INT PRIMARY KEY AUTO_INCREMENT,
@@ -29,7 +32,7 @@ CREATE TABLE tipos_platos (
 );
 
 INSERT INTO tipos_platos (nombre_tipo, imagen_tipo) VALUES 
-('Bebidas', "images/imagen.jpg"),
+('Bebidas', NULL),
 ('Bocadillos Calientes', NULL),
 ('Bocadillos Fríos', NULL),
 ('Platos Combinados', NULL),
@@ -51,7 +54,7 @@ INSERT INTO alergenos (nombre_alergeno, imagen_alergeno) VALUES
 CREATE TABLE platos (
     id_plato INT PRIMARY KEY AUTO_INCREMENT,
     nombre_plato VARCHAR(100) NOT NULL,
-    descripcion TEXT DEFAULT NULL, -- 🔥 Nueva columna para la descripción
+    descripcion TEXT DEFAULT NULL,
     id_tipo INT,
     alergenos JSON DEFAULT NULL,
     imagen_plato VARCHAR(255) DEFAULT NULL,
@@ -67,7 +70,6 @@ INSERT INTO platos (nombre_plato, descripcion, id_tipo, alergenos, imagen_plato,
 ('Plato combinado nº1', 'Carne a la plancha, patatas fritas y huevo.', 4, '[1,2]', NULL, 7.50),
 ('Tarta de queso', 'Deliciosa tarta de queso casera.', 5, '[1,2,4]', NULL, 3.00);
 
--- Tabla de comandas
 CREATE TABLE comandas (
     id_comanda INT PRIMARY KEY AUTO_INCREMENT,
     id_mesa INT,
@@ -76,7 +78,6 @@ CREATE TABLE comandas (
     FOREIGN KEY (id_mesa) REFERENCES mesas(id_mesa)
 );
 
--- Tabla de platos en cada comanda
 CREATE TABLE comanda_platos (
     id_comanda_plato INT PRIMARY KEY AUTO_INCREMENT,
     id_comanda INT,

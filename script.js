@@ -35,16 +35,9 @@ function openLista() {
   if (platosElegidos.length > 0) {
     content = "<table>";
     content +=
-      "<thead><tr><th>Sumar precio al total</th><th>Plato</th><th>Cantidad</th><th>Precio</th><th>Eliminar</th></tr></thead><tbody>";
-
+      "<thead><tr><th>Plato</th><th>Cantidad</th><th>Precio</th><th>Eliminar</th></tr></thead><tbody>";
     platosElegidos.forEach((p) => {
-      const checkedAttr = p.incluido ? "checked" : "";
       content += `<tr data-uniqueid='${p.uniqueId}'>
-            <td>
-                <input type='checkbox' ${checkedAttr} onchange='toggleIncluidoById("${
-        p.uniqueId
-      }", this)' />
-            </td>
             <td>${p.nombre}</td>
             <td>
                 <input type='number' min='1' value='${
@@ -86,15 +79,6 @@ function cambiarCantidadById(uniqueId, input) {
   const plato = platosElegidos.find((p) => p.uniqueId === uniqueId);
   if (plato && valor >= 1) {
     plato.cantidad = valor;
-    actualizarPopup();
-  }
-}
-
-// Toggle incluido por uniqueId
-function toggleIncluidoById(uniqueId, checkbox) {
-  const plato = platosElegidos.find((p) => p.uniqueId === uniqueId);
-  if (plato) {
-    plato.incluido = checkbox.checked;
     actualizarPopup();
   }
 }
