@@ -29,6 +29,8 @@ if (isset($_POST['id_mesa'])) {
     <h1>Tipos de Platos</h1>
     <?php echo renderItemList($tipos, 'tipos'); ?>
     <button id="btnLista" onclick="openLista()">Ver platos elegidos</button>
+    <button class="btn-buscador" onclick="openBuscadorPlatos()">🔍 Buscar platos</button>
+
 </body>
 
 </html>

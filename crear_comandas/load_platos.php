@@ -2,12 +2,16 @@
 require_once '../conexion.php';
 require_once 'funciones.php';
 
-$idTipo = intval($_GET['id_tipo'] ?? 0);
-$query = $conn->query("SELECT * FROM platos WHERE id_tipo = $idTipo");
+if ($_GET['id_tipo']) {
+    $query = $conn->query("SELECT * FROM platos WHERE id_tipo = " . $_GET['id_tipo']);
+} else {
+    $query = $conn->query("SELECT * FROM platos");
+}
+
 $platos = $query->fetch_all(MYSQLI_ASSOC);
 
-$content = "<div class='filtro-container'>";
 $resultAlergenos = $conn->query("SELECT * FROM alergenos");
+$content = "<div class='filtro-container'>";
 
 if ($resultAlergenos && $resultAlergenos->num_rows > 0) {
     $content .= "<strong>Excluir alérgenos:</strong>";
@@ -20,6 +24,10 @@ if ($resultAlergenos && $resultAlergenos->num_rows > 0) {
 }
 
 $content .= "</div>";
+   $content .= '<input type="text" id="buscadorInput" 
+             placeholder="Escribe para buscar..." 
+             onkeyup="filtrarBusqueda()" 
+             style="width:100%;padding:10px;margin-bottom:15px;">';
 $content .= "<div id='listaPlatos'>" . renderItemList($platos, 'platos', $conn) . "</div>";
 
 echo createPopup($_GET["nombre_tipo"], $content);

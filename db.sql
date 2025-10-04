@@ -84,6 +84,7 @@ CREATE TABLE comanda_platos (
     id_plato INT,
     cantidad INT,
     precio DECIMAL(10,2) DEFAULT 0.00,
+    servido BOOLEAN DEFAULT false,
     FOREIGN KEY (id_comanda) REFERENCES comandas(id_comanda),
     FOREIGN KEY (id_plato) REFERENCES platos(id_plato)
 );
