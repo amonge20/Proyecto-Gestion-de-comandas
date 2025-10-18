@@ -27,7 +27,7 @@ $content .= "</div>";
    $content .= '<input type="text" id="buscadorInput" 
              placeholder="Escribe para buscar..." 
              onkeyup="filtrarBusqueda()" 
-             style="width:100%;padding:10px;margin-bottom:15px;">';
+             style="width:60%;padding:10px;margin-bottom:15px;">';
 $content .= "<div id='listaPlatos'>" . renderItemList($platos, 'platos', $conn) . "</div>";
 
 echo createPopup($_GET["nombre_tipo"], $content);

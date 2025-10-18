@@ -13,83 +13,106 @@ $max = $res->fetch_assoc();
 $ultimaComandaId = $max['max_id'] ?? 0;
 ?>
 
-<h1>Lista de comandas</h1>
-<div id="estado-comandas" style="margin-top:15px; font-weight:bold; color:red;"></div>
-<!-- Contenedor solo para mesas y comandas -->
-<div id="contenedor-mesas">
-<?php
-// Obtener mesas con comandas
-$sql = "SELECT c.id_comanda, c.id_mesa, c.fecha, c.precio_total,
-               m.id_estado, e.nombre_estado
-        FROM mesas m
-        JOIN comandas c ON m.id_mesa = c.id_mesa
-        JOIN estados_mesa e ON m.id_estado = e.id_estado
-        ORDER BY m.id_mesa ASC, c.fecha ASC";
-$result = $conn->query($sql);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Comandas</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="script.js" defer></script>
+</head>
 
-// Agrupar comandas por mesa
-$mesas = [];
-while ($row = $result->fetch_assoc()) {
-    $id_mesa = $row['id_mesa'];
-    if (!isset($mesas[$id_mesa])) {
-        $mesas[$id_mesa] = [
-            'id_estado' => $row['id_estado'],
-            'comandas' => []
-        ];
-    }
-    if ($row['id_comanda'] !== null) {
-        $mesas[$id_mesa]['comandas'][] = [
-            'id_comanda' => $row['id_comanda'],
-            'fecha' => $row['fecha'],
-            'precio_total' => $row['precio_total']
-        ];
-    }
-}
+<body>
+  <header>
+    <h1>🍽️ Gestión de Comandas</h1>
+    <p>Total de comandas: <strong><?php echo $totalComandas; ?></strong></p>
+  </header>
 
-// Mostrar mesas y comandas
-foreach ($mesas as $id_mesa => $mesa) {
-    echo "<div class='mesa' id='mesa-$id_mesa' style='border:1px solid #ccc; padding:10px; margin-bottom:10px;'>";
-    echo "<h2>Mesa $id_mesa</h2>";
+  <div id="estado-comandas"></div>
 
-    // Botón para borrar todas las comandas de la mesa
-    echo "<button style='margin-bottom:10px; background:darkred; color:white; border:none; border-radius:4px; padding:5px 10px; cursor:pointer;' 
-             onclick='borrarComandasMesa($id_mesa)'>🗑️ Borrar TODAS las comandas de esta mesa</button>";
+  <div id="contenedor-mesas">
+  <?php
+  // Obtener mesas con comandas
+  $sql = "SELECT c.id_comanda, c.id_mesa, c.fecha, c.precio_total,
+                m.id_estado, e.nombre_estado
+          FROM mesas m
+          JOIN comandas c ON m.id_mesa = c.id_mesa
+          JOIN estados_mesa e ON m.id_estado = e.id_estado
+          ORDER BY c.fecha ASC";
+  $result = $conn->query($sql);
 
-    if (!empty($mesa['comandas'])) {
-        foreach ($mesa['comandas'] as $comanda) {
-            echo "<div class='comanda' id='comanda-{$comanda['id_comanda']}' style='margin-left:20px; padding:5px; border-bottom:1px dashed #ccc;'>";
-            echo "<strong>Comanda {$comanda['id_comanda']} - Precio total: {$comanda['precio_total']} € - Fecha: {$comanda['fecha']}</strong>";
+  // Agrupar comandas por mesa
+  $mesas = [];
+  while ($row = $result->fetch_assoc()) {
+      $id_mesa = $row['id_mesa'];
+      if (!isset($mesas[$id_mesa])) {
+          $mesas[$id_mesa] = [
+              'id_estado' => $row['id_estado'],
+              'comandas' => []
+          ];
+      }
+      if ($row['id_comanda'] !== null) {
+          $mesas[$id_mesa]['comandas'][] = [
+              'id_comanda' => $row['id_comanda'],
+              'fecha' => $row['fecha'],
+              'precio_total' => $row['precio_total']
+          ];
+      }
+  }
 
-            // Platos de la comanda
-            $sql2 = "SELECT cp.id_comanda_plato, cp.cantidad, cp.precio, p.nombre_plato, cp.servido
-                     FROM comanda_platos cp
-                     JOIN platos p ON cp.id_plato = p.id_plato
-                     WHERE cp.id_comanda = {$comanda['id_comanda']}";
-            $res2 = $conn->query($sql2);
+  // Mostrar mesas y comandas
+  foreach ($mesas as $id_mesa => $mesa) {
+      echo "<div class='mesa-card' id='mesa-$id_mesa'>";
+      echo "<div class='mesa-header'>";
+      echo "<h2>Mesa $id_mesa</h2>";
+      echo "<button class='btn-borrar-todas' onclick='borrarComandasMesa($id_mesa)'>🗑️ Borrar todas</button>";
+      echo "</div>";
 
-            echo "<ul>";
-            while ($plato = $res2->fetch_assoc()) {
-                $estado = ($plato['servido'] ?? 0) ? "Servido" : "Pendiente";
-                $color = ($plato['servido'] ?? 0) ? "green" : "red";
-                echo "<li>
-                        {$plato['nombre_plato']} - Cantidad: {$plato['cantidad']} - Precio: {$plato['precio']} €
-                        <span class='estado-plato' 
-                              data-id='{$plato['id_comanda_plato']}' 
-                              data-servido='{$plato['servido']}'
-                              style='cursor:pointer; padding:4px 8px; margin-left:10px; border-radius:4px; background:$color; color:white;'>
-                            $estado
-                        </span>
-                      </li>";
-            }
-            echo "</ul></div>";
-        }
-    }
-    echo "</div>";
-}
-?>
-</div>
+      if (!empty($mesa['comandas'])) {
+          foreach ($mesa['comandas'] as $comanda) {
+              echo "<div class='comanda-card' id='comanda-{$comanda['id_comanda']}'>";
+              echo "<div class='comanda-info'>";
+              echo "<strong>Comanda #{$comanda['id_comanda']}</strong>";
+              echo "<span class='precio-total'>{$comanda['precio_total']} €</span>";
+              echo "<span class='fecha-comanda'>📅 {$comanda['fecha']}</span>";
+              echo "<button class='btn-borrar' onclick='borrarComanda({$comanda['id_comanda']})'>❌</button>";
+              echo "</div>";
 
-<script>
+              // Platos de la comanda
+              $sql2 = "SELECT cp.id_comanda_plato, cp.cantidad, cp.precio, p.nombre_plato, cp.servido
+                      FROM comanda_platos cp
+                      JOIN platos p ON cp.id_plato = p.id_plato
+                      WHERE cp.id_comanda = {$comanda['id_comanda']}";
+              $res2 = $conn->query($sql2);
+
+              echo "<ul class='platos-lista'>";
+              while ($plato = $res2->fetch_assoc()) {
+                  $servido = (int)($plato['servido'] ?? 0);
+                  $estado = $servido ? "Servido" : "Pendiente";
+                  $clase = $servido ? "servido" : "pendiente";
+                  echo "<li class='plato-item'>
+                          <span class='nombre'>{$plato['nombre_plato']}</span>
+                          <span class='cantidad'>x{$plato['cantidad']}</span>
+                          <span class='precio'>{$plato['precio']} €</span>
+                          <span class='estado $clase' 
+                                data-id='{$plato['id_comanda_plato']}' 
+                                data-servido='{$servido}'>
+                                $estado
+                          </span>
+                        </li>";
+              }
+              echo "</ul></div>";
+          }
+      } else {
+          echo "<p class='sin-comandas'>No hay comandas para esta mesa.</p>";
+      }
+      echo "</div>";
+  }
+  ?>
+  </div>
+
+  <script>
     let ultimaComandaId = <?php echo $ultimaComandaId; ?>;
-</script>
-<script src="script.js"></script>
+  </script>
+</body>
+</html>

@@ -28,7 +28,7 @@ function openLista() {
   if (platosElegidos.length > 0) {
     content = "<table>";
     content +=
-      "<thead><tr><th>Plato</th><th>Cantidad</th><th>Precio</th><th>Eliminar</th></tr></thead><tbody>";
+      "<thead><tr><th>Plato</th><th>Cantidad</th><th>Precio Unitario</th><th>Precio Total</th><th>Eliminar</th></tr></thead><tbody>";
 
     platosElegidos.forEach((p) => {
       content += `<tr data-uniqueid='${p.uniqueId}'>
@@ -37,6 +37,7 @@ function openLista() {
                 <input type='number' min='1' value='${p.cantidad}' 
                   style='width:60px' onchange='cambiarCantidadById("${p.uniqueId}", this)' />
             </td>
+            <td>${p.precio.toFixed(2)} €</td>
             <td>${(p.precio * p.cantidad).toFixed(2)} €</td>
             <td>
                 <button onclick='removeFromListById("${p.uniqueId}")'>❌</button>
@@ -47,8 +48,8 @@ function openLista() {
     content += "</tbody></table>";
     content += `<p id='totalPrecio' style='text-align:right; font-weight:bold; margin-top:10px;'>
       Total: ${calcularTotal().toFixed(2)} €</p>`;
-    content += `<button id="btnEnviarComanda" class='btn' onclick='enviarComanda()'>
-      Enviar comanda</button>`;
+    content += `<div class="botones"><button class="btn" onclick="closePopup()">Seguir Mirando</button><button id="btnEnviarComanda" class='btn' onclick='enviarComanda()'>
+      Enviar comanda</button></div>`;
   } else {
     content = "No has elegido ningún plato.";
   }
@@ -99,7 +100,6 @@ function createPopupHTML(title, content) {
   return `
     <div class='popup-overlay' onclick='closePopup(event)'>
         <div class='popup' onclick='event.stopPropagation()'>
-            <button class='btn-close' onclick='closePopup()'>&times;</button>
             <h2>${title}</h2>
             <div class='popup-content'>${content}</div>
         </div>
