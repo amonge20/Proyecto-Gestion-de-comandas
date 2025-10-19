@@ -794,9 +794,9 @@ input[type=number]::-moz-number-spin-box {
 
   .btn-close {
     position: absolute;
-    top: 8px;
+    top: 2px;
     right: 8px;
-    font-size: 22px;
+    font-size: 37px;
     color: var(--beige);
   }
 

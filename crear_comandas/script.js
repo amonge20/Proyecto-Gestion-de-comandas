@@ -48,10 +48,17 @@ function openLista() {
     content += "</tbody></table>";
     content += `<p id='totalPrecio' style='text-align:right; font-weight:bold; margin-top:10px;'>
       Total: ${calcularTotal().toFixed(2)} €</p>`;
-    content += `<div class="botones"><button class="btn" onclick="closePopup()">Seguir Mirando</button><button id="btnEnviarComanda" class='btn' onclick='enviarComanda()'>
-      Enviar comanda</button></div>`;
+    content += `<div class="botones">
+      <button class="btn" onclick="closePopup()">
+        Seguir Mirando
+      </button>
+      <button id="btnEnviarComanda" class='btn' onclick='enviarComanda()'>
+        Enviar comanda
+      </button>
+      </div>`;
   } else {
     content = "No has elegido ningún plato.";
+    content += `<div class="botones"><button class="btn" onclick="closePopup()">Seguir Mirando</button></div>`;
   }
 
   const overlayExistente = document.querySelector(".popup-overlay");
