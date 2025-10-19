@@ -61,9 +61,8 @@ if (!empty($fase)) {
 
         form {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
             align-items: center;
+            gap: 15px;
         }
 
         button {
@@ -76,7 +75,6 @@ if (!empty($fase)) {
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s ease, transform 0.1s ease;
-            width: 220px;
             text-transform: uppercase;
             box-shadow: 0 3px 6px rgba(0,0,0,0.15);
         }

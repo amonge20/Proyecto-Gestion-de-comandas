@@ -1,3 +1,35 @@
+let idiomaActual = "es"; // inicial por defecto
+let traducciones = {
+  es: {
+    popupTitulo: "Platos elegidos",
+    total: "Total",
+    seguirMirando: "Seguir Mirando",
+    enviarComanda: "Enviar comanda",
+    sinPlatos: "No has elegido ningún plato",
+    tabla: {
+      plato: "Plato",
+      cantidad: "Cantidad",
+      precioUnitario: "Precio Unitario",
+      precioTotal: "Precio Total",
+      eliminar: "Eliminar"
+    }
+  },
+  cat: {
+    popupTitulo: "Plats escollits",
+    total: "Total",
+    seguirMirando: "Seguir Mirant",
+    enviarComanda: "Enviar comanda",
+    sinPlatos: "No has triat cap plat",
+    tabla: {
+      plato: "Plat",
+      cantidad: "Quantitat",
+      precioUnitario: "Preu Unitari",
+      precioTotal: "Preu Total",
+      eliminar: "Eliminar"
+    }
+  }
+};
+
 let platosElegidos = [];
 
 // Añadir plato
@@ -22,13 +54,19 @@ function addToList(btn) {
   actualizarPopup();
 }
 
-// Abrir popup de lista de platos elegidos
 function openLista() {
+  const t = traducciones[idiomaActual]; // traducir según idiomaActual
   let content;
+
   if (platosElegidos.length > 0) {
     content = "<table>";
-    content +=
-      "<thead><tr><th>Plato</th><th>Cantidad</th><th>Precio Unitario</th><th>Precio Total</th><th>Eliminar</th></tr></thead><tbody>";
+    content += `<thead><tr>
+        <th>${t.tabla.plato}</th>
+        <th>${t.tabla.cantidad}</th>
+        <th>${t.tabla.precioUnitario}</th>
+        <th>${t.tabla.precioTotal}</th>
+        <th>${t.tabla.eliminar}</th>
+      </tr></thead><tbody>`;
 
     platosElegidos.forEach((p) => {
       content += `<tr data-uniqueid='${p.uniqueId}'>
@@ -40,25 +78,21 @@ function openLista() {
             <td>${p.precio.toFixed(2)} €</td>
             <td>${(p.precio * p.cantidad).toFixed(2)} €</td>
             <td>
-                <button onclick='removeFromListById("${p.uniqueId}")'>❌</button>
+                <button class="eliminar" onclick='removeFromListById("${p.uniqueId}")'>❌</button>
             </td>
         </tr>`;
     });
 
     content += "</tbody></table>";
     content += `<p id='totalPrecio' style='text-align:right; font-weight:bold; margin-top:10px;'>
-      Total: ${calcularTotal().toFixed(2)} €</p>`;
+      ${t.total}: ${calcularTotal().toFixed(2)} €</p>`;
     content += `<div class="botones">
-      <button class="btn" onclick="closePopup()">
-        Seguir Mirando
-      </button>
-      <button id="btnEnviarComanda" class='btn' onclick='enviarComanda()'>
-        Enviar comanda
-      </button>
+      <button class="btn" onclick="closePopup()">${t.seguirMirando}</button>
+      <button id="btnEnviarComanda" class='btn' onclick='enviarComanda()'>${t.enviarComanda}</button>
       </div>`;
   } else {
-    content = "No has elegido ningún plato.";
-    content += `<div class="botones"><button class="btn" onclick="closePopup()">Seguir Mirando</button></div>`;
+    content = t.sinPlatos;
+    content += `<div class="botones"><button class="btn" onclick="closePopup()">${t.seguirMirando}</button></div>`;
   }
 
   const overlayExistente = document.querySelector(".popup-overlay");
@@ -66,7 +100,7 @@ function openLista() {
 
   document.body.insertAdjacentHTML(
     "beforeend",
-    createPopupHTML("Platos elegidos", content)
+    createPopupHTML(t.popupTitulo, content)
   );
 }
 
@@ -208,4 +242,27 @@ function openBuscadorPlatos() {
         createPopupHTML("Buscar platos", html) // aquí activamos el buscador
       );
     });
+}
+
+function cambiarIdioma(idioma) {
+  idiomaActual = idioma; // actualizar idioma global para JS
+  fetch("idioma.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "idioma=" + encodeURIComponent(idioma),
+  })
+  .then(res => res.json())
+  .then(data => {
+    // Actualizar los bloques en la página
+    document.querySelector("header").innerHTML = `
+      <div class="botones_idiomas">
+        <img class='bandera' src='../images/spain.png' alt='spain' onclick="cambiarIdioma('es')">
+        <img class='bandera' src='../images/catalonia.png' alt='catalonia' onclick="cambiarIdioma('cat')">
+      </div>
+      ${data.header}
+    `;
+    document.getElementById("lista-platos").innerHTML = data.platos;
+    document.querySelector(".lista-botones").innerHTML = data.botones;
+  })
+  .catch(err => console.error("Error al cambiar idioma:", err));
 }

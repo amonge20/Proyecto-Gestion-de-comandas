@@ -223,6 +223,7 @@ button:hover {
     align-content: center;
     flex-wrap: wrap;
     justify-content: center;
+    margin-bottom: 72px;
 }
 
 .card {
@@ -235,6 +236,10 @@ button:hover {
   flex: 1 1 30%;
   max-width: 17%;
   margin-top: 26px;
+}
+
+.popup .card {
+  max-width: 42%;
 }
 
 .card-img {
@@ -282,7 +287,6 @@ button:hover {
 .alergenos {
   font-size: 13px;
   color: #d35400;
-  margin-top: auto;
 }
 
 .alergeno-icon {
@@ -350,6 +354,11 @@ td {
 }
 
 input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.bandera {
+  width: 46px;
   cursor: pointer;
 }
 
@@ -606,6 +615,11 @@ input[type=number]::-moz-number-spin-box {
   padding: 10px 0;
 }
 
+.eliminar {
+  background-color: transparent;
+  border: none;
+}
+
 @media (max-width: 992px) {
 
   /* ================================
@@ -677,7 +691,7 @@ input[type=number]::-moz-number-spin-box {
     padding: 10px 15px;
     margin: 6px 4px;
     border: none;
-    font-size: 14px;
+    font-size: 25px;
   }
 
   .btn-primary {
@@ -747,9 +761,7 @@ input[type=number]::-moz-number-spin-box {
   }
 
   .popup-content {
-    padding: 10px;
-    overflow-y: auto;
-    flex: 1;
+    font-size: 25px;
   }
 
   .btn-close {
@@ -772,6 +784,10 @@ input[type=number]::-moz-number-spin-box {
     width: 100%;
   }
 
+  .popup .card {
+    max-width: 47%;
+  }
+
   .card-img,
   .card-placeholder {
     width: 100%;
@@ -792,21 +808,19 @@ input[type=number]::-moz-number-spin-box {
   }
 
   .descripcion {
-    font-size: 13px;
+    font-size: 25px;
     color: #555;
-    margin-bottom: 4px;
   }
 
   .precio {
-    font-size: 14px;
+    font-size: 25px;
     color: #222;
     margin-bottom: 4px;
   }
 
   .alergenos {
-    font-size: 12px;
+    font-size: 25px;
     color: #d35400;
-    margin-top: auto;
   }
 
   .alergeno-icon {
@@ -877,11 +891,7 @@ input[type=number]::-moz-number-spin-box {
   }
 
   #btnLista {
-    padding: 12px 20px;
-    background: var(--verde);
-    color: white;
-    border: none;
-    border-radius: 10px;
+    
     z-index: 1001;
   }
 
