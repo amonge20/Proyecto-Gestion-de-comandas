@@ -2,7 +2,8 @@
 require_once '../conexion.php';
 require_once 'funciones.php';
 
-if ($_GET['id_tipo']) {
+$id_tipo = $_GET['id_tipo'] ?? 0;
+if ($id_tipo != 0) {
     $query = $conn->query("SELECT * FROM platos WHERE id_tipo = " . $_GET['id_tipo']);
 } else {
     $query = $conn->query("SELECT * FROM platos");
@@ -30,5 +31,5 @@ $content .= "</div>";
              style="width:60%;padding:10px;margin-bottom:15px;">';
 $content .= "<div id='listaPlatos'>" . renderItemList($platos, 'platos', $conn) . "</div>";
 
-echo createPopup($_GET["nombre_tipo"], $content);
+echo $content;
 ?>

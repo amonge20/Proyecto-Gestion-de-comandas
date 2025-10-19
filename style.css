@@ -217,10 +217,12 @@ button:hover {
    TARJETAS DE PLATOS
 ================================================ */
 .card-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 15px;
+    display: flex;
+    gap: 15px;
+    flex-direction: row;
+    align-content: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .card {
@@ -231,7 +233,8 @@ button:hover {
   display: flex;
   flex-direction: column;
   flex: 1 1 30%;
-  max-width: 30%;
+  max-width: 17%;
+  margin-top: 26px;
 }
 
 .card-img {
@@ -725,26 +728,13 @@ input[type=number]::-moz-number-spin-box {
   /* ================================
        POPUPS
     ================================ */
-  .popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 5px;
-  }
-
   .popup {
     background: #fff;
-    border-radius: 12px;
-    width: 95%;
-    max-height: 90%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
+    border-radius: unset;
+    width: 100%;
+    height: 100%;
+    max-height: unset;
+    max-width: unset;
   }
 
   .popup h2 {
@@ -752,7 +742,7 @@ input[type=number]::-moz-number-spin-box {
     padding: 12px;
     background: var(--marron-oscuro);
     color: var(--beige);
-    font-size: 18px;
+    font-size: 40px;
     text-align: center;
   }
 
@@ -764,20 +754,15 @@ input[type=number]::-moz-number-spin-box {
 
   .btn-close {
     position: absolute;
-    top: 2px;
+    top: 0;
     right: 8px;
-    font-size: 37px;
+    font-size: 61px;
     color: var(--beige);
   }
 
   /* ================================
        TARJETAS DE PLATOS
     ================================ */
-  .card-grid {
-    display: flex;
-    gap: 12px;
-  }
-
   .card {
     background: #fff;
     border-radius: 12px;
@@ -906,5 +891,11 @@ input[type=number]::-moz-number-spin-box {
     font-size: 40px;
     border-radius: 0 !important;
     padding-block: 30px;
+  }
+
+  .popup-overlay {
+    justify-content: unset;
+    align-items: unset;
+    padding: unset;
   }
 }

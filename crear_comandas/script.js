@@ -107,6 +107,7 @@ function createPopupHTML(title, content) {
   return `
     <div class='popup-overlay' onclick='closePopup(event)'>
         <div class='popup' onclick='event.stopPropagation()'>
+            <button class='btn-close' onclick='closePopup()'>&times;</button>
             <h2>${title}</h2>
             <div class='popup-content'>${content}</div>
         </div>
@@ -120,7 +121,7 @@ function loadPlatos(idTipo, nombreTipo) {
     .then((html) => {
       document.body.insertAdjacentHTML(
         "beforeend",
-        createPopupHTML(`Platos: ${nombreTipo}`, html)
+        createPopupHTML(`${nombreTipo}`, html)
       );
     });
 }

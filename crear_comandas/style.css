@@ -79,7 +79,6 @@ button {
 .card-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
   gap: 15px;
 }
 
@@ -227,29 +226,6 @@ tbody {
 
 th, td {
   text-align: center;
-}
-
-/* Responsive tablets y móviles */
-@media (max-width: 1024px) {
-  .card {
-    flex: 1 1 48%;
-    max-width: 48%;
-  } /* 2 por fila */
-}
-
-@media (max-width: 767px) {
-  .card {
-    flex: 1 1 100%;
-    max-width: 100%;
-  } /* 1 por fila */
-  .popup {
-    max-width: 95%;
-    max-height: 90%;
-  }
-  .popup h2 {
-    font-size: 18px;
-    padding: 10px 40px 10px 10px;
-  }
 }
 
 .btn-fixed {

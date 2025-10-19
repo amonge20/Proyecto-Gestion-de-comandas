@@ -1,17 +1,4 @@
 <?php
-// Función para crear popup
-function createPopup($title, $content)
-{
-    return "
-    <div class='popup-overlay' onclick='closePopup(event)'>
-        <div class='popup' onclick='event.stopPropagation()'>
-            <button class='btn-close' onclick='closePopup()'>&times;</button>
-            <h2>{$title}</h2>
-            <div class='popup-content'>{$content}</div>
-        </div>
-    </div>";
-}
-
 // Función para renderizar cards de tipos de platos o platos
 function renderItemList($items, $type = 'default', $conn = null)
 {
