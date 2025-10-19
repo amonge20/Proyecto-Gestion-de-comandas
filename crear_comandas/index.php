@@ -43,7 +43,9 @@ if (isset($_POST['id_mesa'])) {
     <?php echo renderItemList($tipos, 'tipos'); ?>
 
     <!-- BOTONES -->
-    <button id="btnLista" class="btn-success" onclick="openLista()">Ver platos elegidos</button>
-    <button class="btn-primary" onclick="openBuscadorPlatos()">🔍 Buscar platos</button>
+    <div class="lista-botones">
+        <button class="btn-primary" onclick="openBuscadorPlatos()">🔍 Buscar platos</button>
+        <button id="btnLista" class="btn-success" onclick="openLista()">Ver platos elegidos</button>
+    </div>
 </body>
 </html>
