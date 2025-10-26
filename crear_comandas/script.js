@@ -11,7 +11,9 @@ let traducciones = {
       cantidad: "Cantidad",
       precioUnitario: "Precio Unitario",
       precioTotal: "Precio Total",
-      eliminar: "Eliminar"
+      anadir: "Añadir",
+      eliminar: "Eliminar",
+      complementos: "Complementos"
     }
   },
   cat: {
@@ -25,7 +27,9 @@ let traducciones = {
       cantidad: "Quantitat",
       precioUnitario: "Preu Unitari",
       precioTotal: "Preu Total",
-      eliminar: "Eliminar"
+      anadir: "Afegir",
+      eliminar: "Eliminar",
+      complementos: "Complements"
     }
   }
 };
@@ -65,26 +69,55 @@ function openLista() {
         <th>${t.tabla.cantidad}</th>
         <th>${t.tabla.precioUnitario}</th>
         <th>${t.tabla.precioTotal}</th>
+        <th>${t.tabla.anadir}</th>
         <th>${t.tabla.eliminar}</th>
       </tr></thead><tbody>`;
 
     platosElegidos.forEach((p) => {
+      // Generar sublista de extras si existen
+      let sublistaExtras = "";
+      if (p.extras && p.extras.length > 0) {
+        sublistaExtras += p.extras
+          .map(
+            (e) =>
+              `
+               <tr class='sublista-extras'>
+                <td>${e.nombre}</td>
+                <td>-</td>
+                <td>+${e.precio.toFixed(2)} €</td>
+                <td>-</td>
+                <td>-</td>
+                <td><button onclick="eliminarExtra('${p.uniqueId}', ${e.id})">❌</button></td>
+                </tr>
+                `
+          )
+          .join("");
+      }
+
       content += `<tr data-uniqueid='${p.uniqueId}'>
-            <td>${p.nombre}</td>
+            <td>
+              ${p.nombre}
+            </td>
             <td>
                 <input type='number' min='1' value='${p.cantidad}' 
                   style='width:60px' onchange='cambiarCantidadById("${p.uniqueId}", this)' />
             </td>
             <td>${p.precio.toFixed(2)} €</td>
-            <td>${(p.precio * p.cantidad).toFixed(2)} €</td>
+            <td>${calcularPrecioPlato(p).toFixed(2)} €</td>
+            <td>
+              <button class="btn-complementos" onclick="openExtrasPopup('${p.uniqueId}')">
+                ${t.tabla.complementos}
+              </button>
+            </td>
             <td>
                 <button class="eliminar" onclick='removeFromListById("${p.uniqueId}")'>❌</button>
             </td>
         </tr>`;
+      content += sublistaExtras;
     });
 
     content += "</tbody></table>";
-    content += `<p id='totalPrecio' style='text-align:right; font-weight:bold; margin-top:10px;'>
+    content += `<p id='totalPrecio' style='text-align:right; font-weight:bold; margin-top:10px;' >
       ${t.total}: ${calcularTotal().toFixed(2)} €</p>`;
     content += `<div class="botones">
       <button class="btn" onclick="closePopup()">${t.seguirMirando}</button>
@@ -104,6 +137,43 @@ function openLista() {
   );
 }
 
+
+// Abrir popup de lista de extras desde PHP
+function openExtrasPopup() {
+  fetch("load_extras.php")
+    .then((r) => r.text())
+    .then((html) => {
+      const t = traducciones[idiomaActual];
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        createPopupHTML(t.tabla.complementos, html)
+      );
+    })
+    .catch((err) => console.error("Error al cargar extras:", err));
+}
+
+// Añadir extra
+function addExtraToList(btn) {
+  const card = btn.closest(".extra");
+  const idExtra = card.getAttribute("data-id");
+  const nombre = card.getAttribute("data-nombre");
+  const precio = parseFloat(card.getAttribute("data-precio"));
+
+  const uniqueId =
+    "extra-" + idExtra + "-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+
+  platosElegidos.push({
+    uniqueId: uniqueId,
+    id: idExtra,
+    nombre: nombre + " (Extra)",
+    precio: precio,
+    cantidad: 1,
+    incluido: true,
+  });
+
+  actualizarPopup();
+}
+
 // Cambiar cantidad
 function cambiarCantidadById(uniqueId, input) {
   const valor = parseInt(input.value);
@@ -120,12 +190,9 @@ function removeFromListById(uniqueId) {
   actualizarPopup();
 }
 
-// Calcular total
+// Calcular total de todos los platos incluyendo extras
 function calcularTotal() {
-  return platosElegidos.reduce(
-    (total, p) => (p.incluido ? total + p.precio * p.cantidad : total),
-    0
-  );
+  return platosElegidos.reduce((total, p) => total + calcularPrecioPlato(p), 0);
 }
 
 // Actualizar popup si está abierto
@@ -200,21 +267,6 @@ function limpiarFiltro() {
   filtrarPlatos();
 }
 
-// Enviar comanda
-function enviarComanda() {
-  fetch("guardar_comanda.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ platos: platosElegidos }),
-  })
-    .then((res) => res.text())
-    .then(() => {
-      alert("Comanda enviada con éxito");
-      platosElegidos = [];
-      actualizarPopup();
-    });
-}
-
 // Cambiar número de mesa
 function cambiarNumMesa(input) {
   const nuevoValor = input.value;
@@ -251,18 +303,92 @@ function cambiarIdioma(idioma) {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: "idioma=" + encodeURIComponent(idioma),
   })
-  .then(res => res.json())
-  .then(data => {
-    // Actualizar los bloques en la página
-    document.querySelector("header").innerHTML = `
+    .then(res => res.json())
+    .then(data => {
+      // Actualizar los bloques en la página
+      document.querySelector("header").innerHTML = `
       <div class="botones_idiomas">
         <img class='bandera' src='../images/spain.png' alt='spain' onclick="cambiarIdioma('es')">
         <img class='bandera' src='../images/catalonia.png' alt='catalonia' onclick="cambiarIdioma('cat')">
       </div>
       ${data.header}
     `;
-    document.getElementById("lista-platos").innerHTML = data.platos;
-    document.querySelector(".lista-botones").innerHTML = data.botones;
+      document.getElementById("lista-platos").innerHTML = data.platos;
+      document.querySelector(".lista-botones").innerHTML = data.botones;
+    })
+    .catch(err => console.error("Error al cambiar idioma:", err));
+}
+
+function openExtrasPopup(uniqueId) {
+  platoActualExtras = uniqueId;
+
+  fetch("load_extras.php")
+    .then((r) => r.text())
+    .then((html) => {
+      const t = traducciones[idiomaActual];
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        createPopupHTML(t.tabla.complementos, html)
+      );
+    })
+    .catch((err) => console.error("Error al cargar extras:", err));
+}
+
+function addExtraToList(btn) {
+  if (!platoActualExtras) {
+    alert("⚠️ Selecciona primero un plato para añadir complementos");
+    return;
+  }
+
+  const card = btn.closest(".extra");
+  const idExtra = parseInt(card.getAttribute("data-id"));
+  const nombre = card.getAttribute("data-nombre");
+  const precio = parseFloat(card.getAttribute("data-precio"));
+
+  const plato = platosElegidos.find((p) => p.uniqueId === platoActualExtras);
+  if (!plato) return;
+
+  if (!plato.extras) plato.extras = [];
+  if (plato.extras.some((e) => e.id === idExtra)) return;
+
+  plato.extras.push({ id: idExtra, nombre, precio });
+  actualizarPopup();
+}
+
+function eliminarExtra(uniqueId, idExtra) {
+  const plato = platosElegidos.find((p) => p.uniqueId === uniqueId);
+  if (plato && plato.extras) {
+    plato.extras = plato.extras.filter((e) => e.id !== idExtra);
+    actualizarPopup();
+  }
+}
+
+// Calcular precio total de un plato incluyendo extras
+function calcularPrecioPlato(plato) {
+  let extras = 0;
+  if (plato.extras && plato.extras.length > 0) {
+    extras = plato.extras.reduce((sum, e) => sum + e.precio, 0);
+  }
+  return (plato.precio + extras) * plato.cantidad;
+}
+
+
+// Calcular total de todos los platos incluyendo extras
+function calcularTotal() {
+  return platosElegidos.reduce((total, p) => total + calcularPrecioPlato(p), 0);
+}
+
+function enviarComanda() {
+  fetch("guardar_comanda.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ platos: platosElegidos }),
   })
-  .catch(err => console.error("Error al cambiar idioma:", err));
+    .then((res) => res.text())
+    .then(() => {
+      alert("✅ Comanda enviada con éxito");
+      platosElegidos = [];
+      actualizarPopup();
+    })
+    .catch((err) => alert("❌ Error al enviar: " + err));
 }
