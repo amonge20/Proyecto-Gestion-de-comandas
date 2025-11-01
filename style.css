@@ -857,6 +857,7 @@ input[type=number]::-moz-number-spin-box {
 
   /* ================================
 <<<<<<< HEAD
+<<<<<<< HEAD
    CONTENEDOR Y MESAS
 ================================ */
 #contenedor-mesas {
@@ -911,10 +912,15 @@ tbody {
   table, thead, tbody, th, td, tr {
     display: block;
 =======
+=======
+>>>>>>> parent of c914082 (Mejoramos vista de movil)
        TABLAS
     ================================ */
   table {
     font-size: 12px;
+<<<<<<< HEAD
+>>>>>>> parent of c914082 (Mejoramos vista de movil)
+=======
 >>>>>>> parent of c914082 (Mejoramos vista de movil)
   }
 
@@ -951,6 +957,7 @@ tbody {
     z-index: 1001;
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 .estado.pendiente {
   background: #e74c3c;
@@ -993,6 +1000,8 @@ tbody {
 }
 
 =======
+=======
+>>>>>>> parent of c914082 (Mejoramos vista de movil)
   .lista-botones button {
     width: 50%;
     margin: unset;
@@ -1006,5 +1015,8 @@ tbody {
     align-items: unset;
     padding: unset;
   }
+<<<<<<< HEAD
+>>>>>>> parent of c914082 (Mejoramos vista de movil)
+=======
 >>>>>>> parent of c914082 (Mejoramos vista de movil)
 }
