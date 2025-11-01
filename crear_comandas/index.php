@@ -40,7 +40,7 @@ $idioma = $_SESSION["idioma"];
             <img class='bandera' src='../images/spain.png' alt='spain' onclick="cambiarIdioma('es')">
             <img class='bandera' src='../images/catalonia.png' alt='catalonia' onclick="cambiarIdioma('cat')">
         </div>
-         <?php
+        <span><?php
             if ($idioma == "es") {
                 echo "Mesa";
             } else if ($idioma == "cat") {
@@ -51,6 +51,8 @@ $idioma = $_SESSION["idioma"];
                min="1" max="30"
                value="<?php echo $_SESSION["id_mesa"]; ?>"
                oninput="cambiarNumMesa(this)">
+    </span>
+        
         <br>
         
         <?php

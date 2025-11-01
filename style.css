@@ -193,7 +193,6 @@ button:hover {
 }
 
 .popup-content {
-  padding: 15px;
   overflow-y: auto;
   flex: 1;
 }
@@ -668,7 +667,7 @@ input[type=number]::-moz-number-spin-box {
 
   header input[type="number"] {
     width: 60px;
-    font-size: 16px;
+    font-size: 24px;
     padding: 5px;
     border-radius: 8px;
     border: none;
@@ -880,53 +879,9 @@ input[type=number]::-moz-number-spin-box {
 }
 
 .mesa-header h2 {
-  font-size: 31px;
+  font-size: 32px;
   margin-block: 10px;
 }
-
-/* ================================
-   TABLAS
-================================ */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-
-thead {
-  background: #f3f3f3;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 6px;
-  text-align: left;
-}
-
-tbody {
-  height: auto;
-}
-
-@media (max-width: 992px) {
-  /* Ocultamos cabeceras y convertimos filas en tarjetas */
-  table, thead, tbody, th, td, tr {
-    display: block;
-=======
-=======
->>>>>>> parent of c914082 (Mejoramos vista de movil)
-       TABLAS
-    ================================ */
-  table {
-    font-size: 12px;
-<<<<<<< HEAD
->>>>>>> parent of c914082 (Mejoramos vista de movil)
-=======
->>>>>>> parent of c914082 (Mejoramos vista de movil)
-  }
-
-  tbody {
-    height: 150px;
-  }
 
   /* ================================
        TEXTOS Y ESTADOS
@@ -957,8 +912,6 @@ tbody {
     z-index: 1001;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 .estado.pendiente {
   background: #e74c3c;
 }
@@ -992,16 +945,17 @@ tbody {
 }
 
 #contenedor-mesas {
-  font-size: 24px;
+  font-size: 25px;
 }
 
 .btn-borrar-todas {
   font-size: 20px;
 }
 
-=======
-=======
->>>>>>> parent of c914082 (Mejoramos vista de movil)
+header span {
+  font-size: 24px;
+}
+
   .lista-botones button {
     width: 50%;
     margin: unset;
@@ -1015,8 +969,21 @@ tbody {
     align-items: unset;
     padding: unset;
   }
-<<<<<<< HEAD
->>>>>>> parent of c914082 (Mejoramos vista de movil)
-=======
->>>>>>> parent of c914082 (Mejoramos vista de movil)
+
+  .checkbox-list label,
+  input[type=text] {
+    font-size: 22px;
+  }
+
+  #buscadorInput {
+    margin-inline: 24px;
+  }
+
+  .filtro-container {
+     margin-inline: 24px;
+  }
+
+  .btn-clear {
+    margin-inline: unset;
+  }
 }
