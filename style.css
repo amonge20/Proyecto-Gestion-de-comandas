@@ -521,7 +521,6 @@ input[type=number]::-moz-number-spin-box {
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
-  margin-bottom: 20px;
 }
 
 .btn-borrar-todas:hover {
@@ -833,7 +832,31 @@ input[type=number]::-moz-number-spin-box {
   /* ================================
        COMANDAS Y MESAS
     ================================ */
+  #contenedor-mesas {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mesa,
+  .mesa-card {
+    padding: 10px;
+  }
+
+  .mesa-header {
+    flex-direction: column;
+    gap: 6px;
+    border-bottom: 1px solid var(--dorado);
+    margin-bottom: 8px;
+  }
+
+  .mesa-header h2 {
+    font-size: 16px;
+  }
+
   /* ================================
+<<<<<<< HEAD
    CONTENEDOR Y MESAS
 ================================ */
 #contenedor-mesas {
@@ -887,53 +910,48 @@ tbody {
   /* Ocultamos cabeceras y convertimos filas en tarjetas */
   table, thead, tbody, th, td, tr {
     display: block;
+=======
+       TABLAS
+    ================================ */
+  table {
+    font-size: 12px;
+>>>>>>> parent of c914082 (Mejoramos vista de movil)
   }
 
-  thead {
-    display: none;
+  tbody {
+    height: 150px;
   }
 
-  tr {
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    padding: 8px;
-    background: #fff;
+  /* ================================
+       TEXTOS Y ESTADOS
+    ================================ */
+  .estado {
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 6px;
   }
 
-  td {
-    border: none;
-    position: relative;
-    padding-left: 50%;
-    font-size: 14px;
+  .estado.servido {
+    background: #2ecc71;
   }
 
-  td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 45%;
-    font-weight: bold;
-    white-space: nowrap;
-    color: #333;
+  .estado.pendiente {
+    background: #e74c3c;
   }
-}
 
-/* ================================
-   TEXTOS Y ESTADOS
-================================ */
-.estado {
-  font-size: 0.8em;
-  padding: 2px 6px;
-  border-radius: 6px;
-  color: #fff;
-}
+  .sin-comandas {
+    text-align: center;
+    padding: 6px 0;
+    font-style: italic;
+    color: #777;
+  }
 
-.estado.servido {
-  background: #2ecc71;
-}
+  #btnLista {
+    
+    z-index: 1001;
+  }
 
+<<<<<<< HEAD
 .estado.pendiente {
   background: #e74c3c;
 }
@@ -974,4 +992,19 @@ tbody {
   font-size: 20px;
 }
 
+=======
+  .lista-botones button {
+    width: 50%;
+    margin: unset;
+    font-size: 40px;
+    border-radius: 0 !important;
+    padding-block: 30px;
+  }
+
+  .popup-overlay {
+    justify-content: unset;
+    align-items: unset;
+    padding: unset;
+  }
+>>>>>>> parent of c914082 (Mejoramos vista de movil)
 }
