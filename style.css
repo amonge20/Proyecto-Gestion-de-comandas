@@ -35,8 +35,6 @@ header {
 
 header input[type="number"],
 header h1 {
-  margin-left: 10px;
-  padding: 5px;
   border-radius: 8px;
   border: none;
   text-align: center;
@@ -521,6 +519,7 @@ input[type=number]::-moz-number-spin-box {
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
+  margin-bottom: 20px;
 }
 
 .btn-borrar-todas:hover {
@@ -675,6 +674,11 @@ input[type=number]::-moz-number-spin-box {
     text-align: center;
   }
 
+  header p {
+    font-size: 20px;
+    margin-top: 0;
+  }
+
   /* ================================
        BOTONES
     ================================ */
@@ -803,23 +807,19 @@ input[type=number]::-moz-number-spin-box {
   }
 
   .card-body h3 {
-    font-size: 25px;
     margin-bottom: 4px;
   }
 
   .descripcion {
-    font-size: 25px;
     color: #555;
   }
 
   .precio {
-    font-size: 25px;
     color: #222;
     margin-bottom: 4px;
   }
 
   .alergenos {
-    font-size: 25px;
     color: #d35400;
   }
 
@@ -832,80 +832,153 @@ input[type=number]::-moz-number-spin-box {
   /* ================================
        COMANDAS Y MESAS
     ================================ */
-  #contenedor-mesas {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .mesa,
-  .mesa-card {
-    padding: 10px;
-  }
-
-  .mesa-header {
-    flex-direction: column;
-    gap: 6px;
-    border-bottom: 1px solid var(--dorado);
-    margin-bottom: 8px;
-  }
-
-  .mesa-header h2 {
-    font-size: 16px;
-  }
-
   /* ================================
-       TABLAS
-    ================================ */
-  table {
-    font-size: 12px;
+   CONTENEDOR Y MESAS
+================================ */
+#contenedor-mesas {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mesa,
+.mesa-card {
+  padding: 10px;
+}
+
+.mesa-header {
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid var(--dorado);
+  margin-bottom: 8px;
+}
+
+.mesa-header h2 {
+  font-size: 26px;
+  margin-block: 10px;
+}
+
+/* ================================
+   TABLAS
+================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+thead {
+  background: #f3f3f3;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: left;
+}
+
+tbody {
+  height: auto;
+}
+
+@media (max-width: 992px) {
+  /* Ocultamos cabeceras y convertimos filas en tarjetas */
+  table, thead, tbody, th, td, tr {
+    display: block;
   }
 
-  tbody {
-    height: 150px;
+  thead {
+    display: none;
   }
 
-  /* ================================
-       TEXTOS Y ESTADOS
-    ================================ */
-  .estado {
-    font-size: 0.8em;
-    padding: 2px 6px;
-    border-radius: 6px;
+  tr {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fff;
   }
 
-  .estado.servido {
-    background: #2ecc71;
+  td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    font-size: 14px;
   }
 
-  .estado.pendiente {
-    background: #e74c3c;
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 45%;
+    font-weight: bold;
+    white-space: nowrap;
+    color: #333;
   }
+}
 
-  .sin-comandas {
-    text-align: center;
-    padding: 6px 0;
-    font-style: italic;
-    color: #777;
-  }
+/* ================================
+   TEXTOS Y ESTADOS
+================================ */
+.estado {
+  font-size: 0.8em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: #fff;
+}
 
-  #btnLista {
-    
-    z-index: 1001;
-  }
+.estado.servido {
+  background: #2ecc71;
+}
 
-  .lista-botones button {
-    width: 50%;
-    margin: unset;
-    font-size: 40px;
-    border-radius: 0 !important;
-    padding-block: 30px;
-  }
+.estado.pendiente {
+  background: #e74c3c;
+}
 
-  .popup-overlay {
-    justify-content: unset;
-    align-items: unset;
-    padding: unset;
-  }
+.sin-comandas {
+  text-align: center;
+  padding: 6px 0;
+  font-style: italic;
+  color: #777;
+}
+
+/* ================================
+   BOTONES Y POPUPS
+================================ */
+#btnLista {
+  z-index: 1001;
+}
+
+.lista-botones button {
+  width: 50%;
+  margin: unset;
+  font-size: 40px;
+  border-radius: 0 !important;
+  padding-block: 30px;
+}
+
+.popup-overlay {
+  justify-content: unset;
+  align-items: unset;
+  padding: unset;
+}
+
+#contenedor-mesas {
+  font-size: 24px;
+}
+
+.btn-borrar-todas {
+  font-size: 20px;
+}
+
+.comanda-info {
+  font-size: 20px;
+}
+
+.platos-lista{
+  font-size: 18px;
+}
+
 }
