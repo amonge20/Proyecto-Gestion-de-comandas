@@ -25,10 +25,10 @@ if ($resultAlergenos && $resultAlergenos->num_rows > 0) {
         $nombre_alergeno = "nombre_alergeno_cat";
     }
 
-    $content .= "<strong>{$excluir_alergenos}:</strong>";
+    $content .= "<h3>{$excluir_alergenos}:</h3>";
     $content .= "<div class='checkbox-list'>";
     while ($row = $resultAlergenos->fetch_assoc()) {
-        $content .= "<label><input type='checkbox' class='filtro-alergeno' value='{$row['id_alergeno']}' onchange='filtrarPlatos()'> {$row[$nombre_alergeno]}</label><br>";
+        $content .= "<label><input type='checkbox' class='filtro-alergeno' value='{$row['id_alergeno']}' onchange='filtrarPlatos()'> {$row[$nombre_alergeno]}</label>";
     }
     $content .= "</div>";
     $content .= "<button onclick='limpiarFiltro()' class='btn-clear'>{$limpiar_filtro}</button>";

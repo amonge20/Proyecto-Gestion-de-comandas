@@ -54,12 +54,20 @@ CREATE TABLE alergenos (
 );
 
 INSERT INTO alergenos (nombre_alergeno, nombre_alergeno_cat, imagen_alergeno) VALUES
-('Gluten', 'Gluten', NULL),
-('Lácteos', 'Làctics', NULL),
-('Frutos secos', 'Fruits secs', NULL),
-('Huevos', 'Ous', NULL),
-('Pescado', 'Peix', NULL),
-('Marisco', 'Marisc', NULL);
+('Altramuces', 'Altramuces', '../images/alergias/altramuces.png'),
+('Apio', 'Api', '../images/alergias/apio.png'),
+('Cacahuetes', 'Cacauets', '../images/alergias/cacahuetes.png'),
+('Crustaceos', 'Crustacis', '../images/alergias/crustaceos.png'),
+('Frutos secos', 'Fruits secs', '../images/alergias/frutos_secos.png'),
+('Gluten', 'Gluten', '../images/alergias/gluten.png'),
+('Huevos', 'Ous', '../images/alergias/huevo.png'),
+('Lácteos', 'Làctics', '../images/alergias/lacteos.png'),
+('Marisco', 'Marisc', '../images/alergias/moluscos.png'),
+('Mostaza', 'Mostassa', '../images/alergias/mostaza.png'),
+('Pescado', 'Peix', '../images/alergias/pescado.png'),
+('Sésamo', 'Sèsam', '../images/alergias/sesamo.png'),
+('Soja', 'Soja', '../images/alergias/soja.png'),
+('Sulfito', 'Sulfit', '../images/alergias/sulfito.png');
 
 CREATE TABLE platos (
     id_plato INT PRIMARY KEY AUTO_INCREMENT,

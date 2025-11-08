@@ -195,6 +195,7 @@ button:hover {
 .popup-content {
   overflow-y: auto;
   flex: 1;
+  margin-inline: 10px;
 }
 
 .btn-close {
@@ -289,9 +290,9 @@ button:hover {
 }
 
 .alergeno-icon {
-  width: 20px;
-  height: 20px;
-  margin: 2px;
+    width: 28px;
+    height: 28px;
+    margin: 2px;
 }
 
 /* ================================================
@@ -359,6 +360,10 @@ input[type="checkbox"] {
 .bandera {
   width: 46px;
   cursor: pointer;
+}
+
+.btn, .btn-primary, .btn-success, .btn-danger, .btn-clear, .btn-add, .btn-fixed {
+  margin-top: auto !important;
 }
 
 /* ================================================
@@ -691,6 +696,7 @@ input[type=number]::-moz-number-spin-box {
     margin: 6px 4px;
     border: none;
     font-size: 25px;
+    margin-top: auto;
   }
 
   .btn-primary {
@@ -802,8 +808,9 @@ input[type=number]::-moz-number-spin-box {
   }
 
   .card-body h3 {
-    font-size: 25px;
-    margin-bottom: 4px;
+    font-size: 28px;
+    margin-block: 17px;
+    margin-inline: 9px;
   }
 
   .descripcion {
@@ -823,8 +830,8 @@ input[type=number]::-moz-number-spin-box {
   }
 
   .alergeno-icon {
-    width: 18px;
-    height: 18px;
+    width: 50px;
+    height: 43px;
     margin: 2px;
   }
 
@@ -855,8 +862,6 @@ input[type=number]::-moz-number-spin-box {
   }
 
   /* ================================
-<<<<<<< HEAD
-<<<<<<< HEAD
    CONTENEDOR Y MESAS
 ================================ */
 #contenedor-mesas {
@@ -972,7 +977,7 @@ header span {
 
   .checkbox-list label,
   input[type=text] {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   #buscadorInput {
@@ -985,5 +990,17 @@ header span {
 
   .btn-clear {
     margin-inline: unset;
+  }
+
+  .card-grid {
+    margin-bottom: 13%;
+  }
+
+  .checkbox-list {
+    margin-block: 16px;
+  }
+
+  .popup-content h3 {
+    margin-block: 23px 0;
   }
 }
