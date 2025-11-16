@@ -207,7 +207,7 @@ INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_p
 ('Hamburguesa, huevo y patatas', 'Hamburguesa, ou i patates', 12, '[4]', NULL, 8.50),
 ('Frankfurt, huevo y patatas', 'Frankfurt, ou i patates', 12, '[4]', NULL, 8.50),
 ('Bacon, huevo y patatas', 'Bacon, huevo y patatas', 12, '[4]', NULL, 8.50),
-('Croquetas, huevo y patatas', 'Croquetes huevo y patatas', 12, '[4]', NULL, 8.50),
+('Croquetas, huevo y patatas', 'Croquetes huevo y patates', 12, '[4]', NULL, 8.50),
 ('Pollo rebozado, huevo y patatas', 'Pollastre rebocat, ou i patates', 12, '[4]', NULL, 8.50),
 ('Pollo a la plancha, huevo y patatas', 'Pollastre a la planxa, ou i patates', 12, '[4]', NULL, 8.50),
 ('Butifarra con judías y pimiento verde', 'Butifarra amb mongetes i pebrot verd', 12, '[4]', NULL, 8.50),
@@ -236,6 +236,11 @@ CREATE TABLE comanda_platos (
     cantidad INT,
     precio DECIMAL(10,2) DEFAULT 0.00,
     servido BOOLEAN DEFAULT false,
+    parent_id_comanda_plato INT DEFAULT NULL, -- referencia a la línea padre si es un extra
     FOREIGN KEY (id_comanda) REFERENCES comandas(id_comanda),
-    FOREIGN KEY (id_plato) REFERENCES platos(id_plato)
+    FOREIGN KEY (id_plato) REFERENCES platos(id_plato),
+    INDEX (parent_id_comanda_plato),
+    CONSTRAINT fk_parent_comanda_plato FOREIGN KEY (parent_id_comanda_plato) REFERENCES comanda_platos(id_comanda_plato) ON DELETE SET NULL
 );
+
+

@@ -78,30 +78,16 @@ $ultimaComandaId = $max['max_id'] ?? 0;
               echo "<button class='btn-borrar' onclick='borrarComanda({$comanda['id_comanda']})'>❌</button>";
               echo "</div>";
 
-              // Platos de la comanda
-              $sql2 = "SELECT cp.id_comanda_plato, cp.cantidad, cp.precio, p.nombre_plato, cp.servido
-                      FROM comanda_platos cp
-                      JOIN platos p ON cp.id_plato = p.id_plato
-                      WHERE cp.id_comanda = {$comanda['id_comanda']}";
-              $res2 = $conn->query($sql2);
+              // incluir listado de platos (usa get_platos_comanda.php para evitar duplicado de código)
+              ob_start();
+              $__backup_GET = $_GET;
+              $_GET['id_comanda'] = $comanda['id_comanda'];
+              include __DIR__ . '/get_platos_comanda.php';
+              $_GET = $__backup_GET;
+              $platos_html = ob_get_clean();
+              echo $platos_html;
 
-              echo "<ul class='platos-lista'>";
-              while ($plato = $res2->fetch_assoc()) {
-                  $servido = (int)($plato['servido'] ?? 0);
-                  $estado = $servido ? "Servido" : "Pendiente";
-                  $clase = $servido ? "servido" : "pendiente";
-                  echo "<li class='plato-item'>
-                          <span class='nombre'>{$plato['nombre_plato']}</span>
-                          <span class='cantidad'>x{$plato['cantidad']}</span>
-                          <span class='precio'>{$plato['precio']} €</span>
-                          <span class='estado $clase' 
-                                data-id='{$plato['id_comanda_plato']}' 
-                                data-servido='{$servido}'>
-                                $estado
-                          </span>
-                        </li>";
-              }
-              echo "</ul></div>";
+              echo "</div>";
           }
       } else {
           echo "<p class='sin-comandas'>No hay comandas para esta mesa.</p>";

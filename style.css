@@ -483,6 +483,17 @@ input[type=number]::-moz-number-spin-box {
   /* Siempre visible */
 }
 
+/* Ocultar flechas de spinner en inputs number */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 #estado-comandas {
   text-align: center;
   font-weight: bold;
@@ -578,21 +589,68 @@ input[type=number]::-moz-number-spin-box {
 
 .plato-item {
   display: flex;
+  flex-direction: column; /* fuerza apilado: plato arriba, extras debajo */
+  align-items: stretch;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.plato-main {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 0;
-  border-bottom: 1px dashed #d9c7a3;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.plato-item .nombre {
-  flex: 2;
-  font-weight: 500;
+.plato-main label,
+.plato-main .nombre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.plato-item .cantidad,
-.plato-item .precio {
-  flex: 1;
-  text-align: center;
+/* Contenedor de extras: ocupa toda la anchura y se coloca debajo del plato */
+.plato-extras {
+  margin-top: 8px;
+  margin-left: 18px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: calc(100% - 18px);
+  box-sizing: border-box;
+}
+
+/* Cada línea de extra se muestra como fila completa debajo del plato */
+.plato-extra-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: #444;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Grupo izquierdo de la extra (checkbox + nombre) */
+.plato-extra-line label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Flecha delante del nombre del extra */
+.plato-extra-line .extra-name::before {
+  content: "➤";
+  margin-right: 8px;
+  color: #9a7a5a;
+  font-weight: 600;
 }
 
 .estado {
@@ -619,7 +677,7 @@ input[type=number]::-moz-number-spin-box {
   padding: 10px 0;
 }
 
-.eliminar {
+.eliminar, .extra {
   background-color: transparent;
   border: none;
 }

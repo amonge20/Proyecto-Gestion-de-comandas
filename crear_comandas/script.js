@@ -11,6 +11,7 @@ let traducciones = {
       cantidad: "Cantidad",
       precioUnitario: "Precio Unitario",
       precioTotal: "Precio Total",
+      extras: "Extras",
       eliminar: "Eliminar"
     }
   },
@@ -25,12 +26,14 @@ let traducciones = {
       cantidad: "Quantitat",
       precioUnitario: "Preu Unitari",
       precioTotal: "Preu Total",
+      extras: "Extres",
       eliminar: "Eliminar"
     }
   }
 };
 
 let platosElegidos = [];
+let currentExtraTarget = null; // uniqueId del plato al que se están añadiendo extras
 
 // estado monitor/export
 let _offlineMonitor = null;
@@ -57,15 +60,94 @@ function getAllPlatosForExport() {
   return Array.isArray(platosElegidos) ? JSON.parse(JSON.stringify(platosElegidos)) : [];
 }
 
-// Añadir plato
+// Cierra únicamente la última popup añadida (no toca popups anteriores)
+function closeTopPopup() {
+  const overlays = document.querySelectorAll('.popup-overlay');
+  if (!overlays || !overlays.length) return;
+  const last = overlays[overlays.length - 1];
+  last.remove();
+}
+
+// Intenta reasignar el comportamiento del botón "cerrar" de la última popup
+function setCloseButtonOfLastPopupToTop() {
+  const overlays = document.querySelectorAll('.popup-overlay');
+  if (!overlays || !overlays.length) return;
+  const last = overlays[overlays.length - 1];
+
+  // selectores comunes para botones de cerrar dentro de la popup
+  const closeSelectors = [
+    '.popup-close',
+    '.popup-header .close',
+    'button[data-close]',
+    '.close-btn',
+    '.btn-cerrar',
+    'button.cerrar',
+    '.btn[data-action="close"]'
+  ];
+
+  // handler en fase de captura: intercepta clicks sobre botones de cerrar o sobre el fondo
+  const handler = function (e) {
+    // si el click es exactamente sobre el overlay (fondo), cerrar solo este overlay
+    if (e.target === last) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      if (last && last.parentNode) last.parentNode.removeChild(last);
+      last.removeEventListener('click', handler, true);
+      return;
+    }
+
+    // si el click ocurre dentro de un botón que coincide con los selectores de cerrar y pertenece a este overlay
+    const selector = closeSelectors.join(',');
+    const btn = e.target.closest(selector);
+    if (btn && last.contains(btn)) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      if (last && last.parentNode) last.parentNode.removeChild(last);
+      last.removeEventListener('click', handler, true);
+      return;
+    }
+    // no hacemos nada: dejar que otros elementos dentro del overlay sigan funcionando
+  };
+
+  // evitar múltiples listeners en la misma overlay
+  if (!last._closeHandlerAttached) {
+    last.addEventListener('click', handler, true); // use capture to intercept antes que otros handlers
+    last._closeHandlerAttached = true;
+  }
+}
+
+// Añadir plato o ingrediente extra según contexto
 function addToList(btn) {
   const card = btn.closest(".card");
   const idPlato = card.getAttribute("data-id");
   const nombre = card.getAttribute("data-nombre");
-  const precio = parseFloat(card.getAttribute("data-precio"));
+  const precio = parseFloat(card.getAttribute("data-precio")) || 0;
 
-  const uniqueId =
-    idPlato + "-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+  // Si estamos en modo "añadir extra" (currentExtraTarget definido), añadimos como extra
+  if (currentExtraTarget) {
+    const target = platosElegidos.find(p => p.uniqueId === currentExtraTarget);
+    if (target) {
+      if (!Array.isArray(target.extras)) target.extras = [];
+      // extra único por selección (cantidad 1 por defecto, independiente del plato)
+      target.extras.push({
+        id: idPlato,
+        nombre,
+        precio: precio,
+        cantidad: 1  // cantidad independiente del plato principal
+      });
+      // cerrar solo la popup de extras (no la de platos elegidos)
+      closeTopPopup();
+      currentExtraTarget = null;
+      syncBackupAndUI();
+      return;
+    } else {
+      // si no existe target, limpiar modo extra
+      currentExtraTarget = null;
+    }
+  }
+
+  // comportamiento normal: añadir plato principal
+  const uniqueId = idPlato + "-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
 
   platosElegidos.push({
     uniqueId: uniqueId,
@@ -74,11 +156,89 @@ function addToList(btn) {
     precio: precio,
     cantidad: 1,
     incluido: true,
+    extras: [] // array de extras asociados a este plato
   });
 
   syncBackupAndUI();
 }
 
+
+// cambiar cantidad de plato (incrementar/decrementar)
+function changePlatoCantidad(uniqueId, delta) {
+  const p = platosElegidos.find(pl => pl.uniqueId === uniqueId);
+  if (!p) return;
+  
+  const nuevaCant = Math.max(1, (p.cantidad || 1) + delta);
+  p.cantidad = nuevaCant;
+  
+  syncBackupAndUI();
+}
+
+// establecer cantidad de plato (desde input)
+function setPlatoCantidad(uniqueId, value) {
+  const p = platosElegidos.find(pl => pl.uniqueId === uniqueId);
+  if (!p) return;
+  
+  const newVal = parseInt(value, 10);
+  if (!isNaN(newVal) && newVal >= 1) {
+    p.cantidad = newVal;
+  }
+  
+  syncBackupAndUI();
+}
+
+// Devolver copia profunda de platosElegidos (exacto como muestra openLista)
+function getAllPlatosForExport() {
+  return Array.isArray(platosElegidos) ? JSON.parse(JSON.stringify(platosElegidos)) : [];
+}
+
+// Añadir plato o ingrediente extra según contexto
+function addToList(btn) {
+  const card = btn.closest(".card");
+  const idPlato = card.getAttribute("data-id");
+  const nombre = card.getAttribute("data-nombre");
+  const precio = parseFloat(card.getAttribute("data-precio")) || 0;
+
+  // Si estamos en modo "añadir extra" (currentExtraTarget definido), añadimos como extra
+  if (currentExtraTarget) {
+    const target = platosElegidos.find(p => p.uniqueId === currentExtraTarget);
+    if (target) {
+      if (!Array.isArray(target.extras)) target.extras = [];
+      // extra único por selección (cantidad 1 por defecto, independiente del plato)
+      target.extras.push({
+        id: idPlato,
+        nombre,
+        precio: precio,
+        cantidad: 1  // cantidad independiente del plato principal
+      });
+      // cerrar solo la popup de extras (no la de platos elegidos)
+      closeTopPopup();
+      currentExtraTarget = null;
+      syncBackupAndUI();
+      return;
+    } else {
+      // si no existe target, limpiar modo extra
+      currentExtraTarget = null;
+    }
+  }
+
+  // comportamiento normal: añadir plato principal
+  const uniqueId = idPlato + "-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+
+  platosElegidos.push({
+    uniqueId: uniqueId,
+    id: idPlato,
+    nombre: nombre,
+    precio: precio,
+    cantidad: 1,
+    incluido: true,
+    extras: [] // array de extras asociados a este plato
+  });
+
+  syncBackupAndUI();
+}
+
+// Abrir lista: ahora muestra botón "Añadir extras" y lista de extras por plato
 function openLista() {
   const t = traducciones[idiomaActual];
   let content;
@@ -90,22 +250,61 @@ function openLista() {
         <th>${t.tabla.cantidad}</th>
         <th>${t.tabla.precioUnitario}</th>
         <th>${t.tabla.precioTotal}</th>
+        <th>${t.tabla.extras}</th>
         <th>${t.tabla.eliminar}</th>
       </tr></thead><tbody>`;
 
     platosElegidos.forEach((p) => {
+      // calcular suma de extras (sin multiplicar por cantidad del plato)
+      const extrasSum = Array.isArray(p.extras) ? p.extras.reduce((s, ex) => s + (Number(ex.precio || 0) * (ex.cantidad || 1)), 0) : 0;
+      const precioUnitFinal = Number(p.precio || 0) + extrasSum;
+      const precioTotalFinal = precioUnitFinal * (p.cantidad || 1);
+
       content += `<tr data-uniqueid='${p.uniqueId}'>
-            <td>${p.nombre}</td>
-            <td>
-                <input type='number' min='1' value='${p.cantidad}' 
-                  style='width:60px' onchange='cambiarCantidadById("${p.uniqueId}", this)' />
+            <td style="vertical-align:middle;">${p.nombre}</td>
+            <td style="vertical-align:middle;">
+                <div style="display:flex; gap:4px; align-items:center;">
+                  <button class="btn-mini" onclick='changePlatoCantidad("${p.uniqueId}", -1)' style="width:28px; padding:2px;">−</button>
+                  <input type='number' min='1' value='${p.cantidad}' 
+                    style='width:45px; text-align:center;' 
+                    onchange='setPlatoCantidad("${p.uniqueId}", this.value)' />
+                  <button class="btn-mini" onclick='changePlatoCantidad("${p.uniqueId}", 1)' style="width:28px; padding:2px;">+</button>
+                </div>
             </td>
-            <td>${p.precio.toFixed(2)} €</td>
-            <td>${(p.precio * p.cantidad).toFixed(2)} €</td>
-            <td>
-                <button class="eliminar" onclick='removeFromListById("${p.uniqueId}")'>❌</button>
+            <td style="vertical-align:middle;">${precioUnitFinal.toFixed(2)} €</td>
+            <td style="vertical-align:middle;">${precioTotalFinal.toFixed(2)} €</td>
+            <td style="vertical-align:middle;">
+              <button class="extra" onclick='openExtrasFor("${p.uniqueId}")' title="Añadir ingredientes extra">➕</button>
+            </td>
+             <td style="vertical-align:middle;">
+              <button class="eliminar" onclick='removeFromListById("${p.uniqueId}")'>❌</button> 
             </td>
         </tr>`;
+
+      // mostrar filas de extras debajo del plato (si existen)
+      if (Array.isArray(p.extras) && p.extras.length) {
+        p.extras.forEach((ex, idx) => {
+          const exPrecioUnit = Number(ex.precio || 0);
+          const exPrecioTotal = exPrecioUnit * (ex.cantidad || 1);
+          // mostrar como subfila con indentación, controles +/- de cantidad
+          content += `<tr class="extra-row" data-parent='${p.uniqueId}' data-extra-idx='${idx}'>
+              <td style="padding-left:24px; font-size:0.95em; color:#333;">➤ ${ex.nombre}</td>
+              <td style="vertical-align:middle;">
+                <div style="display:flex; gap:4px; align-items:center;">
+                  <button class="btn-mini" onclick='changeExtraCantidad("${p.uniqueId}", ${idx}, -1)' style="width:28px; padding:2px;">−</button>
+                  <input type='number' min='1' value='${ex.cantidad || 1}' 
+                    style='width:45px; text-align:center;' 
+                    onchange='setExtraCantidad("${p.uniqueId}", ${idx}, this.value)' />
+                  <button class="btn-mini" onclick='changeExtraCantidad("${p.uniqueId}", ${idx}, 1)' style="width:28px; padding:2px;">+</button>
+                </div>
+              </td>
+              <td style="vertical-align:middle;">${exPrecioUnit.toFixed(2)} €</td>
+              <td style="vertical-align:middle;">${exPrecioTotal.toFixed(2)} €</td>
+              <td style="vertical-align:middle;"></td>
+              <td style="vertical-align:middle;"><button class="eliminar" onclick='removeExtra("${p.uniqueId}", ${idx})'>❌</button></td>
+          </tr>`;
+        });
+      }
     });
 
     content += "</tbody></table>";
@@ -129,6 +328,58 @@ function openLista() {
   );
 }
 
+// cambiar cantidad de extra (incrementar/decrementar)
+function changeExtraCantidad(uniqueId, exIdx, delta) {
+  const p = platosElegidos.find(pl => pl.uniqueId === uniqueId);
+  if (!p || !Array.isArray(p.extras) || !p.extras[exIdx]) return;
+  
+  const nuevaCant = Math.max(1, (p.extras[exIdx].cantidad || 1) + delta);
+  p.extras[exIdx].cantidad = nuevaCant;
+  
+  syncBackupAndUI();
+}
+
+// establecer cantidad de extra (desde input)
+function setExtraCantidad(uniqueId, exIdx, value) {
+  const p = platosElegidos.find(pl => pl.uniqueId === uniqueId);
+  if (!p || !Array.isArray(p.extras) || !p.extras[exIdx]) return;
+  
+  const newVal = parseInt(value, 10);
+  if (!isNaN(newVal) && newVal >= 1) {
+    p.extras[exIdx].cantidad = newVal;
+  }
+  
+  syncBackupAndUI();
+}
+
+// abrir selector de extras para un plato concreto
+function openExtrasFor(uniqueId) {
+  currentExtraTarget = uniqueId;
+  // abrir popup con platos del tipo "Para añadir" (id_tipo = 2 en la BDD)
+  loadPlatos(2, 'Para añadir');
+}
+
+// eliminar extra por índice
+function removeExtra(uniqueId, index) {
+  const p = platosElegidos.find(pl => pl.uniqueId === uniqueId);
+  if (!p || !Array.isArray(p.extras)) return;
+  p.extras.splice(index, 1);
+  syncBackupAndUI();
+}
+
+// recalcular total teniendo en cuenta extras (cantidad de extra es independiente del plato)
+function calcularTotal() {
+  return platosElegidos.reduce((total, p) => {
+    if (!p.incluido) return total;
+    const base = Number(p.precio || 0);
+    // extras: precio * cantidad_extra (NO se multiplica por cantidad del plato principal)
+    const extrasSum = Array.isArray(p.extras) ? p.extras.reduce((s, ex) => s + (Number(ex.precio || 0) * (ex.cantidad || 1)), 0) : 0;
+    const precioUnitFinal = base + extrasSum;
+    const cantidad = Number(p.cantidad || 0);
+    return total + precioUnitFinal * cantidad;
+  }, 0);
+}
+
 function cambiarCantidadById(uniqueId, input) {
   const valor = parseInt(input.value);
   const plato = platosElegidos.find((p) => p.uniqueId === uniqueId);
@@ -141,13 +392,6 @@ function cambiarCantidadById(uniqueId, input) {
 function removeFromListById(uniqueId) {
   platosElegidos = platosElegidos.filter((p) => p.uniqueId !== uniqueId);
   syncBackupAndUI();
-}
-
-function calcularTotal() {
-  return platosElegidos.reduce(
-    (total, p) => (p.incluido ? total + p.precio * p.cantidad : total),
-    0
-  );
 }
 
 function actualizarPopup() {
@@ -168,13 +412,25 @@ function createPopupHTML(title, content) {
 }
 
 function loadPlatos(idTipo, nombreTipo) {
-  fetch(`load_platos.php?id_tipo=${idTipo}&nombre_tipo=${nombreTipo}`)
+  // construir querystring sólo con parámetros definidos
+  const params = new URLSearchParams();
+  if (idTipo !== null && idTipo !== undefined) params.append('id_tipo', idTipo);
+  if (nombreTipo) params.append('nombre_tipo', nombreTipo);
+
+  fetch(`load_platos.php?${params.toString()}`)
     .then((r) => r.text())
     .then((html) => {
       document.body.insertAdjacentHTML(
         "beforeend",
-        createPopupHTML(`${nombreTipo}`, html)
+        createPopupHTML(`${nombreTipo || 'Platos'}`, html)
       );
+
+      // reasignar aquí el botón cerrar de la popup recién añadida para que cierre solo esa popup
+      setCloseButtonOfLastPopupToTop();
+    })
+    .catch(err => {
+      console.error('Error cargando platos:', err);
+      alert('No se pudieron cargar los ingredientes extra.');
     });
 }
 
@@ -187,11 +443,14 @@ function filtrarBusqueda() {
   });
 }
 
-function closePopup(event) {
-  if (!event || event.target.classList.contains("popup-overlay")) {
-    const overlay = document.querySelector(".popup-overlay");
-    if (overlay) overlay.remove();
-  }
+function closePopup() {
+  const overlays = document.querySelectorAll('.popup-overlay');
+  if (!overlays || !overlays.length) return;
+  const top = overlays[overlays.length - 1];
+  if (!top) return;
+  // evitar que otros handlers se ejecuten en este overlay
+  // y eliminar sólo este overlay
+  top.remove();
 }
 
 function filtrarPlatos() {
@@ -216,16 +475,66 @@ function limpiarFiltro() {
 }
 
 function enviarComanda() {
+  if (!Array.isArray(platosElegidos) || !platosElegidos.length) {
+    alert('No hay platos para enviar.');
+    return;
+  }
+
+  // Construir líneas: plato principal + sus extras como líneas separadas
+  const lineas = [];
+  platosElegidos.forEach(p => {
+    lineas.push({
+      id_plato: Number(p.id),
+      cantidad: Number(p.cantidad || 1),
+      precio_unitario: Number(p.precio || 0),
+      tipo: 'plato',
+      uniqueId: p.uniqueId
+    });
+
+    if (Array.isArray(p.extras)) {
+      p.extras.forEach(ex => {
+        lineas.push({
+          id_plato: Number(ex.id),
+          cantidad: Number(ex.cantidad || 1),
+          precio_unitario: Number(ex.precio || 0),
+          tipo: 'extra',
+          parent_uniqueId: p.uniqueId
+        });
+      });
+    }
+  });
+
+  const payload = {
+    total: Number(calcularTotal() || 0),
+    lineas: lineas,
+    timestamp: new Date().toISOString()
+  };
+
+  // Enviar como application/x-www-form-urlencoded para compatibilidad con PHP
+  const body = 'payload=' + encodeURIComponent(JSON.stringify(payload));
+
   fetch("guardar_comanda.php", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ platos: platosElegidos }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+    body: body,
   })
-    .then((res) => res.text())
-    .then(() => {
+    .then((res) => {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json().catch(() => null);
+    })
+    .then((data) => {
+      // asumir éxito si no hay error HTTP; adaptar según respuesta de guardar_comanda.php
       alert("Comanda enviada con éxito");
+      // cerrar popup de platos elegidos si existe
+      const overlay = document.querySelector('.popup-overlay[data-popup="platos-elegidos"]') || document.querySelector('.popup-overlay');
+      if (overlay) overlay.remove();
+      // limpiar selección
       platosElegidos = [];
       syncBackupAndUI();
+    })
+    .catch((err) => {
+      console.error('Error enviando comanda:', err);
+      alert('Error al enviar la comanda. Comprueba la conexión.');
     });
 }
 
@@ -278,7 +587,6 @@ function cambiarIdioma(idioma) {
 }
 
 /* ---------------- Export / XLSX / XLS fallback ---------------- */
-
 function exportPlatosFile(platos, filename) {
   if (!platos || !platos.length) return false;
   const t = traducciones[idiomaActual] || traducciones.es;
@@ -289,12 +597,41 @@ function exportPlatosFile(platos, filename) {
     t.tabla.precioTotal || 'Precio Total'
   ];
 
-  const rows = platos.map(p => {
-    const nombre = p.nombre || '';
-    const cantidad = (typeof p.cantidad !== 'undefined' && p.cantidad !== null) ? Number(p.cantidad) : '';
-    const precioUnit = (typeof p.precio !== 'undefined' && p.precio !== null) ? Number(p.precio) : '';
-    const precioTotal = (cantidad !== '' && precioUnit !== '') ? Number(precioUnit) * Number(cantidad) : '';
-    return { nombre, cantidad, precioUnit, precioTotal };
+  // Generar filas: por cada plato principal, una fila resumen (precio unitario incluye extras asignados)
+  // y debajo filas con cada extra (indentadas). Extras usan assignedUnits.length si existe, sino ex.cantidad.
+  const rows = [];
+  platos.forEach(p => {
+    const extrasSum = Array.isArray(p.extras) ? p.extras.reduce((s, ex) => {
+      const assigned = Array.isArray(ex.assignedUnits) ? ex.assignedUnits.length : (Number(ex.cantidad || 1));
+      return s + (Number(ex.precio || 0) * assigned);
+    }, 0) : 0;
+
+    const precioUnitFinal = Number(p.precio || 0) + extrasSum;
+    const cantidad = Number(p.cantidad || 0);
+    const precioTotal = precioUnitFinal * cantidad;
+
+    // fila del plato principal
+    rows.push({
+      nombre: p.nombre || '',
+      cantidad: cantidad || '',
+      precioUnit: precioUnitFinal === '' ? '' : Number(precioUnitFinal),
+      precioTotal: precioTotal === '' ? '' : Number(precioTotal)
+    });
+
+    // filas de extras (mostrar nombre y precio unitario; cantidad = número de unidades asignadas)
+    if (Array.isArray(p.extras) && p.extras.length) {
+      p.extras.forEach(ex => {
+        const assignedCount = Array.isArray(ex.assignedUnits) ? ex.assignedUnits.length : (Number(ex.cantidad || 1));
+        const exPrecioUnit = Number(ex.precio || 0);
+        const exPrecioTotal = exPrecioUnit * assignedCount; // NO multiplicar por p.cantidad
+        rows.push({
+          nombre: '  - ' + (ex.nombre || ''),
+          cantidad: assignedCount || '',
+          precioUnit: exPrecioUnit,
+          precioTotal: exPrecioTotal
+        });
+      });
+    }
   });
 
   const finalFilename = filename || `comanda_offline_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xlsx`;
@@ -308,8 +645,8 @@ function exportPlatosFile(platos, filename) {
       html += `<tr>
           <td>${escapeHtml(r.nombre)}</td>
           <td>${r.cantidad !== '' ? r.cantidad : ''}</td>
-          <td>${r.precioUnit !== '' ? r.precioUnit.toFixed(2) : ''}</td>
-          <td>${r.precioTotal !== '' ? r.precioTotal.toFixed(2) : ''}</td>
+          <td>${r.precioUnit !== '' ? Number(r.precioUnit).toFixed(2) : ''}</td>
+          <td>${r.precioTotal !== '' ? Number(r.precioTotal).toFixed(2) : ''}</td>
       </tr>`;
     });
     html += `</tbody></table></body></html>`;

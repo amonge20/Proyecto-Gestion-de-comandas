@@ -177,23 +177,15 @@ function exportMesasToExcel(filename) {
       }
       comandaId = comandaId || '';
 
-      // precio total comanda (si aparece explícito) - preferir elementos específicos antes que <strong>
+      // precio total comanda (si aparece explícito)
       let precioTotal = '';
-
-      // Buscar primero elementos que deberían contener el importe explícito
       let precioEl = comandaDiv.querySelector('.precio-total, .comanda-total, .total, .importe, .precio-valor, .precio');
       if (precioEl) {
-        // extraer el último número con decimales que aparezca en ese elemento
         const m = (precioEl.innerText || '').match(/([0-9]+[.,][0-9]{1,2})/g);
-        if (m && m.length) {
-          precioTotal = m[m.length - 1].replace(',', '.');
-        } else {
-          // si hay elemento pero no contiene número, dejar vacío para fallback más abajo
-          precioTotal = '';
-        }
+        if (m && m.length) precioTotal = m[m.length - 1].replace(',', '.');
+        else precioTotal = '';
       }
 
-      // Si no se encontró en los selectores específicos, intentar en <strong> o en el texto completo
       if (!precioTotal) {
         const strong = comandaDiv.querySelector('strong, b, .comanda-id');
         if (strong) {
@@ -202,62 +194,132 @@ function exportMesasToExcel(filename) {
         }
       }
 
-      // Último recurso: buscar "Precio total" dentro del texto completo de la comanda
       if (!precioTotal) {
         const m = (comandaDiv.innerText || '').match(/precio\s*(?:total|:)?\s*[:\s]*([0-9]+[.,][0-9]{1,2})/i);
         if (m) precioTotal = m[1].replace(',', '.');
       }
 
-      // extraer líneas de platos
-      let platos = Array.from(comandaDiv.querySelectorAll('ul li, li, .plato, .plato-item, .item-plato, td.plato'));
-      if (!platos.length) {
-        const text = comandaDiv.innerText || '';
-        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !/comanda\s*\d+/i.test(l) && !/precio/i.test(l));
-        lines.forEach(line => platos.push({ innerText: line }));
-      }
-
-      // recopilamos filas temporales de la comanda para poder calcular suma si falta precioTotal
-      const filasComanda = [];
+      // Buscar platos estructurados
+      let platos = Array.from(comandaDiv.querySelectorAll('.plato-item.plato-principal, .plato-principal'));
+      let filasComanda = [];
       let sumaLineas = 0;
 
       if (platos.length) {
         platos.forEach((platoNode) => {
-          const text = (platoNode.innerText || String(platoNode)).trim();
-          let cantidad = parseCantidad(text);
+          // nombre plato
+          const nombreEl = platoNode.querySelector('.plato-main .nombre, .plato-main strong, .plato-main label, .nombre') || platoNode.querySelector('strong') || platoNode;
+          const nombrePlato = (nombreEl && (nombreEl.innerText || nombreEl.textContent)) ? (nombreEl.innerText || nombreEl.textContent).trim() : String(platoNode.innerText || '').trim();
+
+          // cantidad y precio del plato principal
+          let cantidad = 1;
+          const cantEl = platoNode.querySelector('.plato-main .cantidad, .cantidad, .qty, .cantidad-plato');
+          if (cantEl) {
+            const m = (cantEl.innerText || cantEl.textContent || '').match(/(\d+)/);
+            if (m) cantidad = parseInt(m[1], 10);
+          } else {
+            cantidad = parseCantidad(nombrePlato);
+          }
 
           let precioUnit = null;
-          try {
-            if (platoNode.querySelector) {
-              const psel = platoNode.querySelector('.precio-unitario, .precio, .precio-ud, .plato-precio, .precio_unit');
-              if (psel) precioUnit = parseCurrency(psel.innerText || psel.textContent);
-              const csel = platoNode.querySelector('.cantidad, .qty, .cantidad-plato');
-              if (csel && (!cantidad || cantidad === 1)) {
-                const q = parseInt((csel.innerText||'').match(/\d+/) || 1, 10);
-                if (!isNaN(q)) cantidad = q;
-              }
-            }
-          } catch (e) { /* ignore */ }
-
-          if (precioUnit === null) {
-            precioUnit = parseCurrency(text);
-          }
+          const precioElLocal = platoNode.querySelector('.plato-main .precio, .plato-main .precio-unitario, .precio, .plato-precio');
+          if (precioElLocal) precioUnit = parseCurrency(precioElLocal.innerText || precioElLocal.textContent);
+          if (precioUnit === null) precioUnit = parseCurrency(nombrePlato);
 
           let precioLinea = '';
           if (precioUnit !== null) {
-            const lower = text.toLowerCase();
-            if (/(total|importe|precio total)/i.test(lower)) {
-              precioLinea = +(precioUnit).toFixed(2);
-              precioUnit = cantidad ? +((precioLinea / cantidad)).toFixed(2) : precioUnit;
-            } else {
-              precioUnit = +precioUnit.toFixed(2);
-              precioLinea = +(precioUnit * cantidad).toFixed(2);
-            }
+            precioUnit = +Number(precioUnit).toFixed(2);
+            precioLinea = +(precioUnit * cantidad).toFixed(2);
           } else {
             precioUnit = '';
             precioLinea = '';
           }
 
           if (typeof precioLinea === 'number' && !isNaN(precioLinea)) sumaLineas += Number(precioLinea);
+
+          // fila principal
+          filasComanda.push([
+            '',
+            `Comanda ${comandaId}`,
+            nombrePlato,
+            cantidad || '',
+            precioUnit === '' ? '' : Number(precioUnit).toFixed(2),
+            precioLinea === '' ? '' : Number(precioLinea).toFixed(2),
+            '' // precio comanda rellenado después
+          ]);
+
+          // Extras anidados: obtener nodos dentro de .plato-extras o .extras-list
+          const extras = Array.from(platoNode.querySelectorAll('.plato-extras .plato-extra-line, .plato-extra-line, .plato-extras li, .extras-list li'));
+          if (extras.length) {
+            extras.forEach((extraNode) => {
+              const nombreExtraEl = extraNode.querySelector('.extra-name') || extraNode.querySelector('span') || extraNode;
+              let nombreExtra = (nombreExtraEl && (nombreExtraEl.innerText || nombreExtraEl.textContent)) ? (nombreExtraEl.innerText || nombreExtraEl.textContent).trim() : String(extraNode.innerText || '').trim();
+
+              // intentar extraer "(n / total)" y limpiar nombre
+              let extraCant = 1;
+              const cantExEl = extraNode.querySelector('.extra-cant, .cantidad, .cant, .qty');
+              if (cantExEl) {
+                const m = (cantExEl.innerText || cantExEl.textContent || '').match(/(\d+)/);
+                if (m) extraCant = parseInt(m[1], 10);
+              } else {
+                const mm = nombreExtra.match(/\((\d+)\s*\/\s*\d+\)/);
+                if (mm) {
+                  extraCant = parseInt(mm[1], 10);
+                  nombreExtra = nombreExtra.replace(/\(\d+\s*\/\s*\d+\)/, '').trim();
+                }
+              }
+
+              // precio unitario del extra
+              let precioUnitExtra = null;
+              const precioExEl = extraNode.querySelector('.extra-precio, .precio, .plato-precio');
+              if (precioExEl) precioUnitExtra = parseCurrency(precioExEl.innerText || precioExEl.textContent);
+              if (precioUnitExtra === null) {
+                const txt = extraNode.innerText || extraNode.textContent || '';
+                precioUnitExtra = parseCurrency(txt);
+              }
+              let precioLineaExtra = '';
+              if (precioUnitExtra !== null) {
+                precioUnitExtra = +Number(precioUnitExtra).toFixed(2);
+                precioLineaExtra = +(precioUnitExtra * extraCant).toFixed(2);
+              } else {
+                precioUnitExtra = '';
+                precioLineaExtra = '';
+              }
+
+              if (typeof precioLineaExtra === 'number' && !isNaN(precioLineaExtra)) sumaLineas += Number(precioLineaExtra);
+
+              filasComanda.push([
+                '',
+                `Comanda ${comandaId}`,
+                '  - ' + nombreExtra,
+                extraCant || '',
+                precioUnitExtra === '' ? '' : Number(precioUnitExtra).toFixed(2),
+                precioLineaExtra === '' ? '' : Number(precioLineaExtra).toFixed(2),
+                ''
+              ]);
+            });
+          }
+        });
+      } else {
+        // fallback anterior: procesar como texto plano si no existen nodos estructurados
+        let platosFallback = Array.from(comandaDiv.querySelectorAll('ul li, li, .plato, .item-plato, td.plato'));
+        if (!platosFallback.length) {
+          const text = comandaDiv.innerText || '';
+          const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !/comanda\s*\d+/i.test(l) && !/precio/i.test(l));
+          lines.forEach(line => platosFallback.push({ innerText: line }));
+        }
+        platosFallback.forEach((platoNode) => {
+          const text = (platoNode.innerText || String(platoNode)).trim();
+          let cantidad = parseCantidad(text);
+          let precioUnit = parseCurrency(text);
+          let precioLinea = '';
+          if (precioUnit !== null) {
+            precioUnit = +precioUnit.toFixed(2);
+            precioLinea = +(precioUnit * cantidad).toFixed(2);
+            sumaLineas += Number(precioLinea);
+          } else {
+            precioUnit = '';
+            precioLinea = '';
+          }
 
           let nombrePlato = text
             .replace(/^\s*\d+\s*[x×]\s*/i, '')
@@ -270,27 +332,22 @@ function exportMesasToExcel(filename) {
           if (!nombrePlato) nombrePlato = text;
 
           filasComanda.push([
-            '', // columna mesa vacía en filas de detalle
+            '',
             `Comanda ${comandaId}`,
             nombrePlato,
             cantidad || '',
             precioUnit === '' ? '' : Number(precioUnit).toFixed(2),
             precioLinea === '' ? '' : Number(precioLinea).toFixed(2),
-            '' // precio comanda lo añadiremos en la última fila de la comanda
+            ''
           ]);
         });
-      } else {
-        filasComanda.push(['', `Comanda ${comandaId}`, '', '', '', '', '']);
       }
 
-      // si no hay precioTotal explícito, usar suma de líneas si es > 0
       if ((!precioTotal || precioTotal === '') && sumaLineas > 0) {
         precioTotal = Number(sumaLineas).toFixed(2);
       }
 
-      // marcar la columna 'Precio Comanda' solo en la primera fila de la comanda (o en la última)
       if (filasComanda.length) {
-        // colocar precioTotal en la primera fila de la comanda para visibilidad
         filasComanda[0][6] = precioTotal || '';
         filasComanda.forEach(f => rows.push(f));
       } else {
@@ -328,20 +385,16 @@ function exportMesasToExcel(filename) {
     html += `</tbody></table></body></html>`;
 
     const blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-    downloadBlob(blob, finalFilename.replace(/\.xlsx?$/i, '.xls'));
-  }
-
-  function downloadBlob(blob, name) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = name;
+    a.download = finalFilename.replace(/\.xlsx?$/i, '.xls');
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 100);
+    }, 200);
   }
 
   function generarXlsxConSheetJS() {
