@@ -28,6 +28,14 @@ function renderItemList($items, $type = 'default', $conn = null)
             $añadir_plato = "Afegir a la llista";
             $ver_platos = "Veure plats";
         }
+
+        // Evitar mostrar el tipo "Para añadir" (o su variante catalana)
+        if ($type === 'tipos') {
+            $skipNames = ['Para añadir', 'Per afegir'];
+            if (in_array(trim($nombre_plato), $skipNames, true)) {
+                continue;
+            }
+        }
         
         $alergenosAttr = !empty($item['alergenos']) ? htmlspecialchars($item['alergenos'], ENT_QUOTES) : '[]';
         $precio = $item['precio'] ?? 0.0;
