@@ -1,42 +1,44 @@
 <?php
-// Función para renderizar cards de tipos de platos o platos
+require_once '../cargar_traducciones.php';
+
 function renderItemList($items, $type = 'default', $conn = null)
 {
+    $t = cargarTraducciones();
+    $idioma = $_SESSION["idioma"] ?? "es";
+
     $html = "<div class='card-grid'>";
 
     foreach ($items as $item) {
+        // Datos dependiendo del tipo
         if ($type == "tipos") {
             $id = $item['id_tipo'];
             $nombre = $item['nombre_tipo'];
             $nombre_cat = $item['nombre_tipo_cat'];
             $imagen = $item['imagen_tipo'];
-        } else if ($type == "platos") {
+        } elseif ($type == "platos") {
             $id = $item['id_plato'];
             $nombre = $item['nombre_plato'];
             $nombre_cat = $item['nombre_plato_cat'];
             $imagen = $item['imagen_plato'];
         }
 
-        if ($_SESSION["idioma"] == "es") {
-            $nombre_plato = $nombre;
-            $nombre_alergeno = "nombre_alergeno";
-            $añadir_plato = "Añadir a la lista";
-            $ver_platos = "Ver platos";
-        } else if ($_SESSION["idioma"] == "cat") {
-            $nombre_plato = $nombre_cat;
-            $nombre_alergeno = "nombre_alergeno_cat";
-            $añadir_plato = "Afegir a la llista";
-            $ver_platos = "Veure plats";
+        // Nombre según idioma
+        $nombre_plato = ($idioma == "es") ? $nombre : $nombre_cat;
+
+        // Alérgenos según idioma
+        $nombre_alergeno = ($idioma == "es") ? "nombre_alergeno" : "nombre_alergeno_cat";
+
+        // Textos del JSON
+        $txt_add = $t["añadirALaLista"] ?? "Añadir a la lista";
+        $txt_ver = $t["verPlatos"] ?? "Ver platos";
+        $placeholder_icon = $t["placeholderImagen"] ?? "📷";
+        $omitibles = $t["omitirTipo"] ?? [];
+
+        // Omitir tipos
+        if ($type === 'tipos' && in_array(trim($nombre_plato), $omitibles, true)) {
+            continue;
         }
 
-        // Evitar mostrar el tipo "Para añadir" (o su variante catalana)
-        if ($type === 'tipos') {
-            $skipNames = ['Para añadir', 'Per afegir'];
-            if (in_array(trim($nombre_plato), $skipNames, true)) {
-                continue;
-            }
-        }
-        
         $alergenosAttr = !empty($item['alergenos']) ? htmlspecialchars($item['alergenos'], ENT_QUOTES) : '[]';
         $precio = $item['precio'] ?? 0.0;
 
@@ -45,7 +47,7 @@ function renderItemList($items, $type = 'default', $conn = null)
         if ($imagen) {
             $html .= "<img src='{$imagen}' class='card-img' alt=''>";
         } else {
-            $html .= "<div class='card-placeholder'>📷</div>";
+            $html .= "<div class='card-placeholder'>{$placeholder_icon}</div>";
         }
 
         $html .= "<div class='card-body'>";
@@ -74,11 +76,11 @@ function renderItemList($items, $type = 'default', $conn = null)
                 }
             }
 
-            $html .= "<button class='btn-add' onclick='addToList(this)'>{$añadir_plato}</button>"; 
+            $html .= "<button class='btn-add' onclick='addToList(this)'>{$txt_add}</button>";
         }
 
         if ($type === 'tipos') {
-            $html .= "<button class='btn' onclick='loadPlatos({$id}, \"{$nombre_plato}\")'>{$ver_platos}</button>";
+            $html .= "<button class='btn' onclick='loadPlatos({$id}, \"{$nombre_plato}\")'>{$txt_ver}</button>";
         }
 
         $html .= "</div></div>";
@@ -87,3 +89,4 @@ function renderItemList($items, $type = 'default', $conn = null)
     $html .= "</div>";
     return $html;
 }
+?>

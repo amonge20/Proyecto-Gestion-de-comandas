@@ -1,0 +1,53 @@
+{
+  "popupTitulo": "Platos elegidos",
+  "total": "Total",
+  "seguirMirando": "Seguir Mirando",
+  "enviarComanda": "Enviar comanda",
+  "sinPlatos": "No hay platos para enviar",
+  "tabla": {
+    "plato": "Plato",
+    "cantidad": "Cantidad",
+    "precioUnitario": "Precio Unitario",
+    "precioTotal": "Precio Total",
+    "extras": "Extras",
+    "eliminar": "Eliminar"
+  },
+  "offline": {
+    "titulo": "Sin conexión",
+    "mensaje": "Se ha perdido la conexión a internet. Descarga la comanda para conservarla.",
+    "descargarExcel": "Descargar Excel"
+  },
+  "online": {
+    "reconectado": "Conexión restablecida"
+  },
+  "filtros": {
+    "excluirAlergenos": "Excluir alérgenos",
+    "limpiarFiltro": "Limpiar filtro"
+  },
+  "busqueda": {
+    "placeholder": "Escribe para buscar..."
+  },
+  "botones": {
+    "anadirALaLista": "Añadir a la lista",
+    "verPlatos": "Ver platos",
+    "buscarPlatos": "🔍 Buscar platos",
+    "verPlatosElegidos": "Ver platos elegidos",
+    "cerrarPopup": "Cerrar",
+    "añadirExtras": "➕",
+    "eliminar": "❌"
+  },
+  "añadirALaLista": "Añadir a la lista",
+  "verPlatos": "Ver platos",
+  "omitirTipo": ["Para añadir"],
+  "placeholderImagen": "📷",
+  "mesa": "Mesa",
+  "tituloTipos": "Tipos de Platos",
+  "alertaOffline": {
+    "titulo": "Sin conexión",
+    "mensaje": "Se ha perdido la conexión a internet. Descarga la comanda para conservarla.",
+    "botonDescargar": "Descargar Excel",
+    "descargando": "Descargando...",
+    "descargado": "Descargado"
+  },
+  "popupOnline": "Conexión restablecida"
+}
