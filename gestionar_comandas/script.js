@@ -113,3 +113,482 @@ if (Notification.permission !== "granted") {
 }
 
 setInterval(checkNuevasComandas, 5000);
+
+// Función añadida: exportar el contenido de #contenedor-mesas a XLSX/XLS
+function exportMesasToExcel(filename) {
+  const cont = document.getElementById('contenedor-mesas');
+  if (!cont) {
+    console.warn('No se encontró #contenedor-mesas');
+    return false;
+  }
+
+  const headers = ['Mesa', 'ID Comanda', 'Plato', 'Cantidad', 'Precio Unitario', 'Precio Línea', 'Precio Comanda'];
+  const rows = [];
+
+  const mesaSelector = '.mesa, .mesa-card';
+  const comandaSelector = '.comanda, .comanda-card, .card-comanda, [data-comanda-id]';
+
+  const parseCurrency = (s) => {
+    if (!s) return null;
+    const m = String(s).match(/([0-9]+[.,][0-9]{1,2})/g);
+    if (!m) return null;
+    const last = m[m.length - 1].replace(',', '.');
+    const n = parseFloat(last);
+    return isNaN(n) ? null : n;
+  };
+
+  const parseCantidad = (s) => {
+    if (!s) return 1;
+    const text = String(s).trim();
+    let m = text.match(/^\s*(\d+)\s*(?:[x×]|ud\b|unidad\b|\bU\b)/i)
+      || text.match(/(\d+)\s*[x×]/)
+      || text.match(/^\s*(\d+)\s+/);
+    return m ? parseInt(m[1], 10) : 1;
+  };
+
+  cont.querySelectorAll(mesaSelector).forEach((mesaDiv) => {
+    let mesaId = '';
+    if (mesaDiv.dataset && mesaDiv.dataset.mesa) mesaId = mesaDiv.dataset.mesa;
+    if (!mesaId && mesaDiv.id) mesaId = mesaDiv.id.replace(/^mesa-/, '');
+    if (!mesaId) {
+      const h = mesaDiv.querySelector('h2, h3, .mesa-titulo');
+      if (h) mesaId = (h.innerText || '').replace(/^[^\d]*(\d+).*/,'$1').trim();
+    }
+    mesaId = mesaId || '';
+
+    // fila separadora/encabezado por mesa
+    rows.push([`Mesa ${mesaId}`, '', '', '', '', '', '']);
+
+    let comandas = Array.from(mesaDiv.querySelectorAll(comandaSelector));
+    if (!comandas.length) {
+      comandas = Array.from(mesaDiv.children).filter(ch => /comanda|pedido|order/i.test(ch.className || '') || ch.getAttribute('data-comanda-id'));
+    }
+
+    comandas.forEach((comandaDiv) => {
+      let comandaId = '';
+      if (comandaDiv.dataset && (comandaDiv.dataset.comandaId || comandaDiv.dataset.id)) comandaId = comandaDiv.dataset.comandaId || comandaDiv.dataset.id;
+      if (!comandaId && comandaDiv.id) comandaId = comandaDiv.id.replace(/^comanda-/, '');
+      if (!comandaId) {
+        const strong = comandaDiv.querySelector('strong, b, .comanda-id');
+        if (strong) {
+          const mm = (strong.innerText || '').match(/\d+/);
+          comandaId = mm ? mm[0] : (strong.innerText || '').trim();
+        }
+      }
+      comandaId = comandaId || '';
+
+      // precio total comanda (si aparece explícito) - preferir elementos específicos antes que <strong>
+      let precioTotal = '';
+
+      // Buscar primero elementos que deberían contener el importe explícito
+      let precioEl = comandaDiv.querySelector('.precio-total, .comanda-total, .total, .importe, .precio-valor, .precio');
+      if (precioEl) {
+        // extraer el último número con decimales que aparezca en ese elemento
+        const m = (precioEl.innerText || '').match(/([0-9]+[.,][0-9]{1,2})/g);
+        if (m && m.length) {
+          precioTotal = m[m.length - 1].replace(',', '.');
+        } else {
+          // si hay elemento pero no contiene número, dejar vacío para fallback más abajo
+          precioTotal = '';
+        }
+      }
+
+      // Si no se encontró en los selectores específicos, intentar en <strong> o en el texto completo
+      if (!precioTotal) {
+        const strong = comandaDiv.querySelector('strong, b, .comanda-id');
+        if (strong) {
+          const mm = (strong.innerText || '').match(/([0-9]+[.,][0-9]{1,2})/g);
+          if (mm && mm.length) precioTotal = mm[mm.length - 1].replace(',', '.');
+        }
+      }
+
+      // Último recurso: buscar "Precio total" dentro del texto completo de la comanda
+      if (!precioTotal) {
+        const m = (comandaDiv.innerText || '').match(/precio\s*(?:total|:)?\s*[:\s]*([0-9]+[.,][0-9]{1,2})/i);
+        if (m) precioTotal = m[1].replace(',', '.');
+      }
+
+      // extraer líneas de platos
+      let platos = Array.from(comandaDiv.querySelectorAll('ul li, li, .plato, .plato-item, .item-plato, td.plato'));
+      if (!platos.length) {
+        const text = comandaDiv.innerText || '';
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !/comanda\s*\d+/i.test(l) && !/precio/i.test(l));
+        lines.forEach(line => platos.push({ innerText: line }));
+      }
+
+      // recopilamos filas temporales de la comanda para poder calcular suma si falta precioTotal
+      const filasComanda = [];
+      let sumaLineas = 0;
+
+      if (platos.length) {
+        platos.forEach((platoNode) => {
+          const text = (platoNode.innerText || String(platoNode)).trim();
+          let cantidad = parseCantidad(text);
+
+          let precioUnit = null;
+          try {
+            if (platoNode.querySelector) {
+              const psel = platoNode.querySelector('.precio-unitario, .precio, .precio-ud, .plato-precio, .precio_unit');
+              if (psel) precioUnit = parseCurrency(psel.innerText || psel.textContent);
+              const csel = platoNode.querySelector('.cantidad, .qty, .cantidad-plato');
+              if (csel && (!cantidad || cantidad === 1)) {
+                const q = parseInt((csel.innerText||'').match(/\d+/) || 1, 10);
+                if (!isNaN(q)) cantidad = q;
+              }
+            }
+          } catch (e) { /* ignore */ }
+
+          if (precioUnit === null) {
+            precioUnit = parseCurrency(text);
+          }
+
+          let precioLinea = '';
+          if (precioUnit !== null) {
+            const lower = text.toLowerCase();
+            if (/(total|importe|precio total)/i.test(lower)) {
+              precioLinea = +(precioUnit).toFixed(2);
+              precioUnit = cantidad ? +((precioLinea / cantidad)).toFixed(2) : precioUnit;
+            } else {
+              precioUnit = +precioUnit.toFixed(2);
+              precioLinea = +(precioUnit * cantidad).toFixed(2);
+            }
+          } else {
+            precioUnit = '';
+            precioLinea = '';
+          }
+
+          if (typeof precioLinea === 'number' && !isNaN(precioLinea)) sumaLineas += Number(precioLinea);
+
+          let nombrePlato = text
+            .replace(/^\s*\d+\s*[x×]\s*/i, '')
+            .replace(/^\s*\d+\s+/i, '')
+            .replace(/([0-9]+[.,][0-9]{1,2})\s*€?/g, '')
+            .replace(/\b(cada|ud|unidad|importe|total|precio)\b/ig, '')
+            .replace(/[-–—]\s*$/,'')
+            .trim();
+
+          if (!nombrePlato) nombrePlato = text;
+
+          filasComanda.push([
+            '', // columna mesa vacía en filas de detalle
+            `Comanda ${comandaId}`,
+            nombrePlato,
+            cantidad || '',
+            precioUnit === '' ? '' : Number(precioUnit).toFixed(2),
+            precioLinea === '' ? '' : Number(precioLinea).toFixed(2),
+            '' // precio comanda lo añadiremos en la última fila de la comanda
+          ]);
+        });
+      } else {
+        filasComanda.push(['', `Comanda ${comandaId}`, '', '', '', '', '']);
+      }
+
+      // si no hay precioTotal explícito, usar suma de líneas si es > 0
+      if ((!precioTotal || precioTotal === '') && sumaLineas > 0) {
+        precioTotal = Number(sumaLineas).toFixed(2);
+      }
+
+      // marcar la columna 'Precio Comanda' solo en la primera fila de la comanda (o en la última)
+      if (filasComanda.length) {
+        // colocar precioTotal en la primera fila de la comanda para visibilidad
+        filasComanda[0][6] = precioTotal || '';
+        filasComanda.forEach(f => rows.push(f));
+      } else {
+        rows.push([``, `Comanda ${comandaId}`, '', '', '', '', precioTotal || '']);
+      }
+    });
+  });
+
+  if (!rows.length) {
+    alert('No hay datos dentro de #contenedor-mesas para exportar.');
+    return false;
+  }
+
+  const finalFilename = filename || `comandas_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xlsx`;
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function generarXlsHtml() {
+    let html = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><table border="1"><thead><tr>`;
+    headers.forEach(h => html += `<th>${escapeHtml(h)}</th>`);
+    html += `</tr></thead><tbody>`;
+    rows.forEach(r => {
+      html += `<tr>
+        <td>${escapeHtml(r[0]||'')}</td>
+        <td>${escapeHtml(r[1]||'')}</td>
+        <td>${escapeHtml(r[2]||'')}</td>
+        <td>${escapeHtml(r[3]||'')}</td>
+        <td>${escapeHtml(r[4]||'')}</td>
+        <td>${escapeHtml(r[5]||'')}</td>
+        <td>${escapeHtml(r[6]||'')}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></body></html>`;
+
+    const blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    downloadBlob(blob, finalFilename.replace(/\.xlsx?$/i, '.xls'));
+  }
+
+  function downloadBlob(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  function generarXlsxConSheetJS() {
+    try {
+      const aoa = [headers, ...rows];
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      Object.keys(ws).forEach(k => {
+        if (k[0] === '!') return;
+        const cell = ws[k];
+        if (typeof cell.v === 'number' || (!isNaN(Number(cell.v)) && cell.v !== '')) {
+          cell.t = 'n';
+          cell.v = Number(cell.v);
+        }
+      });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Comandas');
+      XLSX.writeFile(wb, finalFilename);
+      return true;
+    } catch (e) {
+      console.warn('Error generando XLSX con SheetJS:', e);
+      return false;
+    }
+  }
+
+  if (window.XLSX) {
+    if (generarXlsxConSheetJS()) return true;
+    generarXlsHtml();
+    return true;
+  }
+
+  const localScript = './xlsx.full.min.js';
+  const scriptLocal = document.createElement('script');
+  scriptLocal.src = localScript;
+  scriptLocal.async = true;
+  let attempted = false;
+  scriptLocal.onload = () => {
+    attempted = true;
+    if (window.XLSX) {
+      if (generarXlsxConSheetJS()) return;
+    }
+    generarXlsHtml();
+  };
+  scriptLocal.onerror = () => {
+    attempted = true;
+    if (navigator.onLine) {
+      const cdnScript = document.createElement('script');
+      cdnScript.src = 'https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js';
+      cdnScript.async = true;
+      cdnScript.onload = () => {
+        if (window.XLSX) {
+          if (generarXlsxConSheetJS()) return;
+        }
+        generarXlsHtml();
+      };
+      cdnScript.onerror = () => {
+        generarXlsHtml();
+      };
+      document.head.appendChild(cdnScript);
+    } else {
+      generarXlsHtml();
+    }
+  };
+
+  if (!navigator.onLine) {
+    document.head.appendChild(scriptLocal);
+    setTimeout(() => { if (!attempted) generarXlsHtml(); }, 300);
+    return true;
+  }
+
+  document.head.appendChild(scriptLocal);
+  setTimeout(() => { if (!attempted) {
+    const cdnScript = document.createElement('script');
+    cdnScript.src = 'https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js';
+    cdnScript.async = true;
+    cdnScript.onload = () => { if (window.XLSX) generarXlsxConSheetJS(); else generarXlsHtml(); };
+    cdnScript.onerror = () => { generarXlsHtml(); };
+    document.head.appendChild(cdnScript);
+  } }, 1500);
+
+  return true;
+}
+
+// Si existe un botón con id 'btnExportMesas', le enlazamos la acción
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btnExportMesas');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      exportMesasToExcel();
+    });
+  }
+});
+
+// Exponer en window para llamadas desde consola o inline onclick
+window.exportMesasToExcel = exportMesasToExcel;
+
+// estado monitor/export
+let _offlineMonitor = null;
+let _exportDone = false;
+
+function showOfflineAlert() {
+  if (document.querySelector('.offline-alert')) return;
+
+  const html = `
+    <div class="offline-alert" style="
+        position: fixed;
+        right: 12px;
+        top: 12px;
+        z-index: 9999;
+        background: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 10px 12px;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+        min-width: 220px;
+        max-width: 300px;
+        font-family: sans-serif;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+    ">
+      <div style="flex:1; margin-right:10px;">
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px;">Sin conexión</div>
+        <div style="font-size:12px;">Se ha perdido la conexión a internet. Descarga las comandas para conservarlas.</div>
+      </div>
+      <div style="flex:0 0 auto; margin-left:8px;">
+        <button id="btnDescargarExcelOffline" class="btn" style="padding:6px 10px;" disabled>Descargar Excel</button>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
+  const btn = document.getElementById('btnDescargarExcelOffline');
+  if (!btn) return;
+  const clone = btn.cloneNode(true);
+  btn.parentNode.replaceChild(clone, btn);
+}
+
+function aplicarEstiloDeshabilitado(el) {
+  el.disabled = true;
+  el.style.pointerEvents = 'none';
+  el.style.background = '#343a40';
+  el.style.color = '#ffffff';
+  el.style.border = '1px solid #23272b';
+  el.style.cursor = 'not-allowed';
+  el.style.opacity = '0.95';
+}
+
+function aplicarEstiloHabilitado(el) {
+  el.disabled = false;
+  el.style.pointerEvents = 'auto';
+  el.style.background = '';
+  el.style.color = '';
+  el.style.border = '';
+  el.style.cursor = 'pointer';
+  el.style.opacity = '';
+}
+
+function configureDownloadButton() {
+  const btn = document.getElementById('btnDescargarExcelOffline');
+  if (!btn) return;
+  const newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+
+  const allRowsExist = document.querySelectorAll('#contenedor-mesas .mesa-card').length > 0;
+
+  if (allRowsExist) {
+    aplicarEstiloHabilitado(newBtn);
+    newBtn.textContent = 'Descargar Excel';
+    newBtn.addEventListener('click', () => {
+      // prevenir múltiples exports
+      if (_exportDone) return;
+      _exportDone = true;
+      exportMesasToExcel();
+    }, { once: true });
+  } else {
+    aplicarEstiloDeshabilitado(newBtn);
+    newBtn.textContent = 'Descargar Excel';
+  }
+}
+
+function startOfflineMonitor(intervalMs = 1000) {
+  if (_offlineMonitor) return;
+  _exportDone = false;
+  showOfflineAlert();
+  configureDownloadButton();
+
+  _offlineMonitor = setInterval(() => {
+    if (navigator.onLine) {
+      // al volver la conexión
+      stopOfflineMonitor();
+      closeOfflineAlert();
+      showOnlinePopup();
+    } else {
+      // si sigue offline, asegurarse de que el botón esté actualizado
+      if (!document.querySelector('.offline-alert')) showOfflineAlert();
+      configureDownloadButton();
+    }
+  }, intervalMs);
+}
+
+function stopOfflineMonitor() {
+  if (_offlineMonitor) {
+    clearInterval(_offlineMonitor);
+    _offlineMonitor = null;
+  }
+}
+
+function closeOfflineAlert() {
+  const el = document.querySelector('.offline-alert');
+  if (el) el.remove();
+}
+
+function showOnlinePopup() {
+  const existing = document.querySelector('.online-toast');
+  if (existing) existing.remove();
+
+  const html = `
+    <div class="online-toast" style="
+        position: fixed;
+        right: 12px;
+        top: 12px;
+        z-index: 10000;
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 10px 14px;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        font-family: sans-serif;
+    ">
+      Conexión restablecida
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => {
+    const el = document.querySelector('.online-toast');
+    if (el) el.remove();
+  }, 3000);
+}
+
+window.addEventListener('offline', () => {
+  console.warn('Se detectó pérdida de conexión. Mostrando alerta superior...');
+  startOfflineMonitor(1000);
+});
+
+window.addEventListener('online', () => {
+  if (_offlineMonitor) stopOfflineMonitor();
+  closeOfflineAlert();
+  showOnlinePopup();
+});
