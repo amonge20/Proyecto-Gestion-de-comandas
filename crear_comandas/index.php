@@ -5,7 +5,8 @@ require_once 'funciones.php';
 
 // Cargar traducciones
 $traducciones = cargarTraducciones();
-$idioma = $_SESSION["idioma"] ?? "es";
+$_SESSION["idioma"] = $_SESSION["idioma"] ?? "es";
+$idioma = $_SESSION["idioma"];
 
 // Obtener lista de tipos de platos
 $query = $conn->query("SELECT * FROM tipos_platos");
