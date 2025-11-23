@@ -575,8 +575,8 @@ function cambiarIdioma(idioma) {
   .then(data => {
     document.querySelector("header").innerHTML = `
       <div class="botones_idiomas">
-        <img class='bandera' src='../images/spain.png' alt='spain' onclick="cambiarIdioma('es')">
-        <img class='bandera' src='../images/catalonia.png' alt='catalonia' onclick="cambiarIdioma('cat')">
+        <img class='bandera' src='../images/es.png' alt='es' onclick="cambiarIdioma('es')">
+        <img class='bandera' src='../images/cat.png' alt='cat' onclick="cambiarIdioma('cat')">
       </div>
       ${data.header}
     `;

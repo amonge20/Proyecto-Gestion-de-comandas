@@ -68,8 +68,8 @@ INSERT INTO alergenos (nombre_alergeno, nombre_alergeno_cat, imagen_alergeno) VA
 ('Sésamo', 'Sèsam', '../images/alergias/sesamo.png'), /*12*/
 ('Soja', 'Soja', '../images/alergias/soja.png'), /*13*/
 ('Sulfito', 'Sulfit', '../images/alergias/sulfito.png'), /*14*/
-('Cerdo', 'Porc', '../images/alergias/cerdo.png'), /*15*/
-('Legumbres', 'Llegums', '../images/alergias/legumbres.png'); /*16*/
+('Legumbres', 'Llegums', '../images/alergias/legumbres.png'), /*15*/
+('Cerdo', 'Porc', '../images/alergias/cerdo.png'); /*16*/
 
 CREATE TABLE platos (
     id_plato INT PRIMARY KEY AUTO_INCREMENT,
@@ -92,47 +92,47 @@ INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_p
 ('Queso', 'Formatge', 2, '[8]', NULL, 0.50),
 ('Cebolla', 'Ceba', 2, NULL, NULL, 0.50),
 ('Pimiento verde', 'Pebrot verd', 2, NULL, NULL, 0.50),
-('Bacon', 'Bacon', 2, NULL, NULL, 1.00),
+('Bacon', 'Bacon', 2, '[16]', NULL, 1.00),
 ('Huevo frito', 'Ou fregit', 2, '[7]', NULL, 1.00),
 ('Patatas fritas', 'Patates fregides', 2, NULL, NULL, 1.50);
 
 /*SANDWICHES*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Bikini (jamón york con queso)', 'Bikini (pernil dolç amb formatge)', 3, '[6,8]', NULL, 3.00),
-('Sant Jordi (atún, huevo frito, queso, mayonesa) 3 pisos', 'Sant Jordi (tonyina, ou ferrat, formatge, maionesa) 3 pisos', 3, '[6,8]', NULL, 5.00),
-('Sant Joan (bacon, huevo frito, queso) 3 pisos', 'Sant Joan (bacon, ou ferrat, formatge) 3 pisos', 3, '[6,8]', NULL, 5.00);
+('Bikini (jamón york con queso)', 'Bikini (pernil dolç amb formatge)', 3, '[6,8,16]', NULL, 3.00),
+('Sant Jordi (atún, huevo frito, queso, mayonesa) 3 pisos', 'Sant Jordi (tonyina, ou ferrat, formatge, maionesa) 3 pisos', 3, '[6,7,8,11]', NULL, 5.00),
+('Sant Joan (bacon, huevo frito, queso) 3 pisos', 'Sant Joan (bacon, ou ferrat, formatge) 3 pisos', 3, '[6,7,8,16]', NULL, 5.00);
 
 /*TORRADAS*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Escalivada con anchoas', 'Escalivada amb anxoves', 4, NULL, NULL, 10.50),
-('Jamón ibérico', 'Pernil ibèric', 4, NULL, NULL, 10.50),
-('Tabla mixta (jamón ibérico y queso)', 'Taula mixta (pernil ibèric i formatge)', 4, '[8]', NULL, 10.50),
-('Lomo con queso', 'Llom amb formatge', 4, '[8]', NULL, 8.50);
+('Escalivada con anchoas', 'Escalivada amb anxoves', 4, '[6,11]', NULL, 10.50),
+('Jamón ibérico', 'Pernil ibèric', 4, '[6,16]', NULL, 10.50),
+('Tabla mixta (jamón ibérico y queso)', 'Taula mixta (pernil ibèric i formatge)', 4, '[6,8,16]', NULL, 10.50),
+('Lomo con queso', 'Llom amb formatge', 4, '[6,8,16]', NULL, 8.50);
 
 /*BOCADILLOS FRÍOS*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Jamón ibérico', 'Pernil ibèric', 5, NULL, NULL, 7.50),
-('Jamón serrano', 'Pernil serrà', 5, NULL, NULL, 4.00),
-('Chorizo o salchichón ibérico', 'Xoriço o salsitxa ibèrica', 5, NULL, NULL, 4.00),
-('Atún', 'Tonyina', 5, '[1]', NULL, 4.00),
-('Queso manchego', 'Formatxe manxec', 5, '[8]', NULL, 4.50),
-('Anchoas (5 filetes)', 'Anxoves (5 filets)', 5, '[11]', NULL, 5.00),
-('Fuet', 'Fuet', 5, NULL, NULL, 4.00);
+('Jamón ibérico', 'Pernil ibèric', 5, '[6,16]', NULL, 7.50),
+('Jamón serrano', 'Pernil serrà', 5, '[6,16]', NULL, 4.00),
+('Chorizo o salchichón ibérico', 'Xoriço o salsitxa ibèrica', 5, '[6,16]', NULL, 4.00),
+('Atún', 'Tonyina', 5, '[6,11]', NULL, 4.00),
+('Queso manchego', 'Formatxe manxec', 5, '[6,8]', NULL, 4.50),
+('Anchoas (5 filetes)', 'Anxoves (5 filets)', 5, '[6,11]', NULL, 5.00),
+('Fuet', 'Fuet', 5, '[6,16]', NULL, 4.00);
 
 /*BOCADILLOS CALIENTES*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Lomo', 'Llom', 6, '[15]', NULL, 4.00),
-('Panceta de cerdo', 'Panceta de porc', 6, '[15]', NULL, 4.00),
-('Bacon', 'Baco', 6, '[15]', NULL, 4.00),
-('Salchichas de país', 'Salsitxes de pais', 6, '[15]', NULL, 4.00),
-('Butifarra', 'Botifarra', 6, '[15]', NULL, 4.50),
+('Lomo', 'Llom', 6, '[16]', NULL, 4.00),
+('Panceta de cerdo', 'Panceta de porc', 6, '[16]', NULL, 4.00),
+('Bacon', 'Baco', 6, '[16]', NULL, 4.00),
+('Salchichas de país', 'Salsitxes de pais', 6, '[16]', NULL, 4.00),
+('Butifarra', 'Botifarra', 6, '[16]', NULL, 4.50),
 ('Tortilla de patatas', 'Truita de patates', 6, '[7]', NULL, 4.00),
 ('Tortilla francesa', 'Truita francesa', 6, '[7]', NULL, 3.50),
 ('Tortilla al gusto', 'Truita al gust', 6, '[7]', NULL, 4.50),
-('Pinchitos', 'Pinxos', 6, '[15]', NULL, 5.00),
+('Pinchitos', 'Pinxos', 6, '[16]', NULL, 5.00),
 ('Pechuga de pollo, plancha', 'Pit de pollastre, planxa', 6, NULL, NULL, 4.00),
 ('Pechuga de pollo, rebozada', 'Pit de pollastre, rebozat', 6, '[6,7]', NULL, 4.00),
-('Lacón', 'Lacó', 6, '[15]', NULL, 4.50);
+('Lacón', 'Lacó', 6, '[16]', NULL, 4.50);
 
 /*TAPAS FRÍAS*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
@@ -143,26 +143,26 @@ INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_p
 ('Aceitunas rellenas', 'Olives farcides', 7, NULL, NULL, 2.50),
 ('Berberechos de lata', 'Berberechos de llauna', 7, '[9]', NULL, 7.00),
 ('Queso manchego', 'Formatge manxec', 7, '[8]', NULL, 6.00),
-('Jamón ibérico', 'Pernil ibèric', 7, '[15]', NULL, 13.50),
-('Tabla mixta', 'Taula mixta', 7, '[7,8,15]', NULL, 13.50),
-('Tabla de embutidos ibéricos', "Taula d'embotits ibèrics", 7, '[15]', NULL, 4.50),
+('Jamón ibérico', 'Pernil ibèric', 7, '[16]', NULL, 13.50),
+('Tabla mixta', 'Taula mixta', 7, '[7,8,16]', NULL, 13.50),
+('Tabla de embutidos ibéricos', "Taula d'embotits ibèrics", 7, '[16]', NULL, 4.50),
 ('Pan con tomate', 'Pa amb tomàquet', 7, '[6]', NULL, 1.80);
 
 /*TAPAS CALIENTES*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
 ('Patatas bravas', 'Patates braves', 8, '[2,3,4,6,7,8,9,10,11,12,13]', NULL, 4.50),
 ('Patatas fritas', 'Patates frites', 8, NULL, NULL, 3.50),
-('Morros', 'Morros', 8, "[15]", NULL, 5.50),
-('Croquetas de pollo (6 unidades)', 'Croquetes de pollastre (6 unitats)', 8, NULL, NULL, 4.50),
-('Croquetas de jamón (6 unidades)', 'Croquetes de pernil (6 unitats)', 8, '[15]', NULL, 4.50),
+('Morros', 'Morros', 8, "[16]", NULL, 5.50),
+('Croquetas de pollo (6 unidades)', 'Croquetes de pollastre (6 unitats)', 8, '[6,7]', NULL, 4.50),
+('Croquetas de jamón (6 unidades)', 'Croquetes de pernil (6 unitats)', 8, '[6,7,16]', NULL, 4.50),
 ('Nuggets de pollo', 'Nuggets de pollastre', 8, '[6,7]', NULL, 4.50),
 ('Alitas de pollo', 'Ales de pollastre', 8, NULL, NULL, 6.50),
 ('Tiras de pollo cojún', 'Tires de pollastre cojun', 8, '[6,7]', NULL, 6.50),
 ('Cazón adobado', 'Cazón adobat', 8, '[6,7]', NULL, 7.50),
-('Pincho', 'Pinxo', 8, '[15]', NULL, 6.50),
-('Cochinillo', 'Porcelli', 8, '[15]', NULL, 6.50),
+('Pincho', 'Pinxo', 8, '[16]', NULL, 6.50),
+('Cochinillo', 'Porcelli', 8, '[16]', NULL, 6.50),
 ('Callos caseros', 'Callos casolans', 8, '[6]', NULL, 7.50),
-('Lacón a la gallega', 'Laco a la gallega', 8, '[15]', NULL, 6.50),
+('Lacón a la gallega', 'Laco a la gallega', 8, '[16]', NULL, 6.50),
 ('Pimientos de padrón', 'Pebrots de padrón', 8, NULL, NULL, 4.50),
 ('Champiñones a la plancha', 'Xampinyons a la planxa', 8, NULL, NULL, 5.50),
 ('Boquerones fritos', 'Boquerons fregits', 8, '[6,7,8,11,14]', NULL, 6.00),
@@ -186,55 +186,55 @@ INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_p
 ('Escalivada (escalivada, atún, anchoas)', 'Escalivada (escalivada, tonyina, anxoves)', 9, '[11]', NULL, 6.00),
 ('Vegetal de pollo (pollo, lechuga, tomate, mayonesa)', 'Vegetal de pollastre (pollastre, enciam, tomàquet, maionesa)', 9, '[6,7,8]', NULL, 5.00),
 ('Pollo de casa (mayonesa, pollo rebozado, ensalada)', 'Pollastre de casa (maionesa, pollastre arrebossat, amanida)', 9, '[6,7,8]', NULL, 5.00),
-('Lomo de casa (lomo, huevo, bacon, queso)', 'Llom de casa (llom, ou, bacon, formatge)', 9, '[6,7,8,15]', NULL, 5.50),
-('Chivito (lomo, bacon, lechuga, tomate, mayonesa)', 'Xivit (llom, bacon, enciam, tomàquet, maionesa)', 9, '[6,7,8,15]', NULL, 5.50),
-('Serranito 1 (lomo, jamón, pimiento verde)', 'Serranit 1 (llom, pernil, pebrot verd)', 9, '[6,15]', NULL, 5.00),
-('Serranito 2 (pepitas de ternera, jamón, pimiento verde)', 'Serranit 2 (fepetes de vedella, pernil, pebrot verd)', 9, '[6,15]', NULL, 5.50);
+('Lomo de casa (lomo, huevo, bacon, queso)', 'Llom de casa (llom, ou, bacon, formatge)', 9, '[6,7,8,16]', NULL, 5.50),
+('Chivito (lomo, bacon, lechuga, tomate, mayonesa)', 'Xivit (llom, bacon, enciam, tomàquet, maionesa)', 9, '[6,7,8,16]', NULL, 5.50),
+('Serranito 1 (lomo, jamón, pimiento verde)', 'Serranit 1 (llom, pernil, pebrot verd)', 9, '[6,16]', NULL, 5.00),
+('Serranito 2 (pepitas de ternera, jamón, pimiento verde)', 'Serranit 2 (fepetes de vedella, pernil, pebrot verd)', 9, '[6,16]', NULL, 5.50);
 
 /*FRANKFURT Y HAMBURGUESAS LEO BOECK - PAN DE VIENA*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Hamburguesa', 'Hamburguesa', 10, '[6,15]', NULL, 4.00),
+('Hamburguesa', 'Hamburguesa', 10, '[6,16]', NULL, 4.00),
 ('Hamburguesa de pollo', 'Hamburguesa de pollastre', 10, '[6]', NULL, 4.00),
 ('Hamburguesa picante', 'Hamburguesa picant', 10, '[6]', NULL, 4.10),
-('Hamburguesa moruna', 'Hamburguesa moruna', 10, '[6,15]', NULL, 4.10),
-('Malagueña', 'Malaguenya', 10, '[6,15]', NULL, 4.50),
-('Super Frankfurt', 'Super Frankfurt', 10, '[6,15]', NULL, 4.00),
-('Cervela', 'Cervela', 10, '[6,15]', NULL, 4.50),
-('Bratwurst', 'Bratwurst', 10, '[6,15]', NULL, 4.50),
-('Pikanwurst', 'Pikanwurst', 10, '[6,15]', NULL, 4.10),
-('Xistorra', 'Xistorra', 10, '[6,15]', NULL, 4.10),
-('Frankfurt de casa (frankfurt, queso, bacon, cebolla)', 'Frankfurt de casa (frankfurt, formatge, bacon, ceba)', 10, '[6,8,15]', NULL, 5.50),
-('Hamburguesa de casa (hamburguesa, cebolla, bacon, queso)', 'Hamburguesa de casa (hamburguesa, ceba, bacon, formatge)', 10, '[6,8,15]', NULL, 5.00),
-('Hamburguesa completa (hamburguesa, cebolla, bacon, huevo, lechuga, tomate, queso)', 'Hamburguesa completa (hamburguesa, ceba, bacon, ou, enciam, tomàquet, formatge)', 10, '[6,7,8,15]', NULL, 6.00);
+('Hamburguesa moruna', 'Hamburguesa moruna', 10, '[6,16]', NULL, 4.10),
+('Malagueña', 'Malaguenya', 10, '[6,16]', NULL, 4.50),
+('Super Frankfurt', 'Super Frankfurt', 10, '[6,16]', NULL, 4.00),
+('Cervela', 'Cervela', 10, '[6,16]', NULL, 4.50),
+('Bratwurst', 'Bratwurst', 10, '[6,16]', NULL, 4.50),
+('Pikanwurst', 'Pikanwurst', 10, '[6,16]', NULL, 4.10),
+('Xistorra', 'Xistorra', 10, '[6,16]', NULL, 4.10),
+('Frankfurt de casa (frankfurt, queso, bacon, cebolla)', 'Frankfurt de casa (frankfurt, formatge, bacon, ceba)', 10, '[6,8,16]', NULL, 5.50),
+('Hamburguesa de casa (hamburguesa, cebolla, bacon, queso)', 'Hamburguesa de casa (hamburguesa, ceba, bacon, formatge)', 10, '[6,8,16]', NULL, 5.00),
+('Hamburguesa completa (hamburguesa, cebolla, bacon, huevo, lechuga, tomate, queso)', 'Hamburguesa completa (hamburguesa, ceba, bacon, ou, enciam, tomàquet, formatge)', 10, '[6,7,8,16]', NULL, 6.00);
 
 /*ENSALADAS*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
 ('Ensalada de casa (lechuga, tomate, olivas, cebolla, maíz, atún, huevo duro, espárragos)', 'Amanida de casa (enciam, tomàquet, olives, blat de moro, tonyina, ou dur, espàrrecs)', 11, '[7,11]', NULL, 6.50),
 ('Ensalada especial de casa (lechuga, salmón ahumado, queso de cabra, tomate cherry, frutos secos, vinagre balsámico)', 'Amanida especial de casa (enciam, salmó fumat, formatge de cabra, tomàquet cherry, fruita seca, vinagre balsàmic)', 11, '[3,8,11,13,14]', NULL, 8.50),
-('Melón con jamón ibérico', 'Meló amb pernil ibèric', 11, '[15]', NULL, 8.50),
-('Piña con jamón ibérico', 'Pinya amb pernil ibèric', 11, '[15]', NULL, 8.50);
+('Melón con jamón ibérico', 'Meló amb pernil ibèric', 11, '[16]', NULL, 8.50),
+('Piña con jamón ibérico', 'Pinya amb pernil ibèric', 11, '[16]', NULL, 8.50);
 
 /*PLATOS COMBINADOS*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Huevos rotos con jamón ibérico', 'Ous trencats amb pernil ibèric', 12, '[7,15]', NULL, 7.50),
+('Huevos rotos con jamón ibérico', 'Ous trencats amb pernil ibèric', 12, '[7,16]', NULL, 7.50),
 ('Pinchitos (patatas, huevo)', 'Pinxets (patates, ou)', 12, '[7]', NULL, 9.00),
-('Bistec con huevos y patatas', 'Bistec amb ous i patates', 12, '[7,15]', NULL, 9.00),
-('Hamburguesa, huevo y patatas', 'Hamburguesa, ou i patates', 12, '[7,15]', NULL, 8.50),
-('Frankfurt, huevo y patatas', 'Frankfurt, ou i patates', 12, '[7,15]', NULL, 8.50),
-('Bacon, huevo y patatas', 'Bacon, huevo y patatas', 12, '[7,15]', NULL, 8.50),
+('Bistec con huevos y patatas', 'Bistec amb ous i patates', 12, '[7,16]', NULL, 9.00),
+('Hamburguesa, huevo y patatas', 'Hamburguesa, ou i patates', 12, '[7,16]', NULL, 8.50),
+('Frankfurt, huevo y patatas', 'Frankfurt, ou i patates', 12, '[7,16]', NULL, 8.50),
+('Bacon, huevo y patatas', 'Bacon, huevo y patatas', 12, '[7,16]', NULL, 8.50),
 ('Croquetas, huevo y patatas', 'Croquetes huevo y patates', 12, '[6,7]', NULL, 8.50),
 ('Pollo rebozado, huevo y patatas', 'Pollastre rebocat, ou i patates', 12, '[6,7]', NULL, 8.50),
 ('Pollo a la plancha, huevo y patatas', 'Pollastre a la planxa, ou i patates', 12, '[7]', NULL, 8.50),
 ('Butifarra con judías y pimiento verde', 'Butifarra amb mongetes i pebrot verd', 12, '[15,16]', NULL, 8.50),
-('Lomo a la plancha, huevo y patatas', 'Llom a la planxa, ou i patates', 12, '[7,15]', NULL, 8.50),
-('Lomo rebozado, huevo y patatas', 'Llom arrebossat, ou i patates', 12, '[6,7,15]', NULL, 8.50),
+('Lomo a la plancha, huevo y patatas', 'Llom a la planxa, ou i patates', 12, '[7,16]', NULL, 8.50),
+('Lomo rebozado, huevo y patatas', 'Llom arrebossat, ou i patates', 12, '[6,7,16]', NULL, 8.50),
 ('Sepia a la plancha, ensalada y patatas', 'Sípia a la planxa, amanida i patates', 12, '[9]', NULL, 11.50),
 ('Pulpitos a la plancha, ensalada y patatas', 'Popets a la planxa, amanida i patates', 12, '[9]', NULL, 9.50),
 ('Chipirones a la plancha, ensalada y patatas', 'Xipirons a la planxa, amanida i patates', 12, '[9]', NULL, 9.50),
 ('Chipirones a la andaluza, ensalada y patatas', 'Xipirons a la andalusa, amanida i patates', 12, '[6,9]', NULL, 9.50),
-('Entregot, huevo y patatas (300gr)', 'Entrecot, ou i patates (300gr)', 12, '[7,15]', NULL, 14.50),
+('Entregot, huevo y patatas (300gr)', 'Entrecot, ou i patates (300gr)', 12, '[7,16]', NULL, 14.50),
 ('Cordero, huevo y patatas', 'Xai, ou i patates', 12, '[7]', NULL, 13.50),
-('Plato infantil (carne, patatas)', 'Plat infantil (carn, patates)', 12, '[15]', NULL, 5.50);
+('Plato infantil (carne, patatas)', 'Plat infantil (carn, patates)', 12, '[16]', NULL, 5.50);
 
 CREATE TABLE comandas (
     id_comanda INT PRIMARY KEY AUTO_INCREMENT,

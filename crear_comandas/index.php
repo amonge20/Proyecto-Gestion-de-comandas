@@ -1,12 +1,11 @@
 <?php
 require_once '../cargar_traducciones.php';
 require_once '../conexion.php';
-require_once 'funciones.php';
+require_once 'render_item_list.php';
 
 // Cargar traducciones
 $traducciones = cargarTraducciones();
 $_SESSION["idioma"] = $_SESSION["idioma"] ?? "es";
-$idioma = $_SESSION["idioma"];
 
 // Obtener lista de tipos de platos
 $query = $conn->query("SELECT * FROM tipos_platos");
@@ -24,7 +23,7 @@ $_SESSION["id_mesa"] = intval($_SESSION["id_mesa"] ?? ($_GET['id_mesa'] ?? 1));
 ?>
 
 <!DOCTYPE html>
-<html lang="<?php echo $idioma; ?>">
+<html lang="<?php echo $_SESSION["idioma"]; ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -40,8 +39,8 @@ $_SESSION["id_mesa"] = intval($_SESSION["id_mesa"] ?? ($_GET['id_mesa'] ?? 1));
     <!-- HEADER con el número de mesa -->
     <header>
         <div class="botones_idiomas">
-            <img class='bandera' src='../images/spain.png' alt='spain' onclick="cambiarIdioma('es')">
-            <img class='bandera' src='../images/catalonia.png' alt='catalonia' onclick="cambiarIdioma('cat')">
+            <img class='bandera' src='../images/es.png' alt='es' onclick="cambiarIdioma('es')">
+            <img class='bandera' src='../images/cat.png' alt='cat' onclick="cambiarIdioma('cat')">
         </div>
         <span>
             <?php echo $traducciones['mesa']; ?>
@@ -50,9 +49,7 @@ $_SESSION["id_mesa"] = intval($_SESSION["id_mesa"] ?? ($_GET['id_mesa'] ?? 1));
                    value="<?php echo $_SESSION["id_mesa"]; ?>"
                    oninput="cambiarNumMesa(this)">
         </span>
-        
         <br>
-        
         <h1><?php echo $traducciones['tituloTipos']; ?></h1>
     </header>
 

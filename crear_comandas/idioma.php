@@ -1,49 +1,46 @@
 <?php
 require_once '../conexion.php';
-require_once 'funciones.php';
+require_once 'render_item_list.php';
+require_once '../cargar_traducciones.php';
 
-// Cambiar idioma en la sesión
-if (isset($_POST['idioma'])) {
-    $idioma = $_POST['idioma'];
-    if (in_array($idioma, ['es', 'cat'])) {
-        $_SESSION['idioma'] = $idioma;
-    }
+// Capturar cualquier salida accidental
+ob_start();
+
+// detectar idiomas dinámicos
+$idiomasDisponibles = array_map(fn($archivo) => pathinfo($archivo, PATHINFO_FILENAME), glob("../idiomas/*.json"));
+
+// cambiar idioma si POST es válido
+if (!empty($_POST['idioma']) && in_array($_POST['idioma'], $idiomasDisponibles)) {
+    $_SESSION['idioma'] = $_POST['idioma'];
 }
 
-$idioma = $_SESSION['idioma'] ?? 'es';
+$traducciones = cargarTraducciones();
 
-// Volvemos a generar los datos necesarios
-$query = $conn->query("SELECT * FROM tipos_platos");
-$tipos = $query->fetch_all(MYSQLI_ASSOC);
+// obtener datos de tipos de platos
+$tipos = $conn->query("SELECT * FROM tipos_platos");
+$tipos = $tipos ? $tipos->fetch_all(MYSQLI_ASSOC) : [];
 
-// Renderizar lista de platos
+// renderizar lista de platos
 $listaPlatos = renderItemList($tipos, 'tipos');
 
-// Renderizar botones
-ob_start();
-if ($idioma == "es") {
-    echo "<button class='btn-primary' onclick='openBuscadorPlatos()'>🔍 Buscar platos</button>";
-    echo "<button id='btnLista' class='btn-success' onclick='openLista()'>Ver platos elegidos</button>";
-} else if ($idioma == "cat") {
-    echo "<button class='btn-primary' onclick='openBuscadorPlatos()'>🔍 Buscar plats</button>";
-    echo "<button id='btnLista' class='btn-success' onclick='openLista()'>Veure plats escollits</button>";
-}
-$listaBotones = ob_get_clean();
+// renderizar botones
+$listaBotones =
+    "<button class='btn-primary' onclick='openBuscadorPlatos()'>{$traducciones['botones']['buscarPlatos']}</button>
+     <button id='btnLista' class='btn-success' onclick='openLista()'>{$traducciones['botones']['verPlatosElegidos']}</button>";
 
-// Renderizar header
-ob_start();
-if ($idioma == "es") {
-    echo "Mesa <input type='number' name='id_mesa' id='id_mesa' min='1' max='30' value='" . ($_SESSION["id_mesa"] ?? 1) . "' oninput='cambiarNumMesa(this)'><br>";
-    echo "<h1>Tipos de Platos</h1>";
-} else if ($idioma == "cat") {
-    echo "Taula <input type='number' name='id_mesa' id='id_mesa' min='1' max='30' value='" . ($_SESSION["id_mesa"] ?? 1) . "' oninput='cambiarNumMesa(this)'><br>";
-    echo "<h1>Tipus de Plats</h1>";
-}
-$headerHtml = ob_get_clean();
+// renderizar header
+$idMesa = $_SESSION["id_mesa"] ?? 1;
+$headerHtml =
+    "{$traducciones['mesa']} <input type='number' name='id_mesa' id='id_mesa' min='1' max='30' value='{$idMesa}' oninput='cambiarNumMesa(this)'><br>
+     <h1>{$traducciones['tituloTipos']}</h1>";
 
-// Devolver todos los bloques como JSON
+// limpiar cualquier salida accidental antes de enviar JSON
+ob_end_clean();
+
+header('Content-Type: application/json');
 echo json_encode([
-    'header' => $headerHtml,
-    'platos' => $listaPlatos,
+    'header'  => $headerHtml,
+    'platos'  => $listaPlatos,
     'botones' => $listaBotones
 ]);
+?>

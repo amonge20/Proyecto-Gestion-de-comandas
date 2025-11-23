@@ -15,7 +15,9 @@
   "offline": {
     "titulo": "Sense connexió",
     "mensaje": "S'ha perdut la connexió a internet. Descarrega la comanda per conservar-la.",
-    "descargarExcel": "Descarregar Excel"
+    "descargarExcel": "Descarregar Excel",
+    "descargando": "Descarregant...",
+    "descargado": "Descarregat"
   },
   "online": {
     "reconectado": "Connexió restablerta"
@@ -32,22 +34,9 @@
     "verPlatos": "Veure plats",
     "buscarPlatos": "🔍 Buscar plats",
     "verPlatosElegidos": "Veure plats escollits",
-    "cerrarPopup": "Tancar",
-    "añadirExtras": "➕",
-    "eliminar": "❌"
+    "cerrarPopup": "Tancar"
   },
-  "añadirALaLista": "Afegir a la llista",
-  "verPlatos": "Veure plats",
   "omitirTipo": ["Per afegir"],
-  "placeholderImagen": "📷",
   "mesa": "Taula",
-  "tituloTipos": "Tipus de Plats",
-  "alertaOffline": {
-    "titulo": "Sense connexió",
-    "mensaje": "S'ha perdut la connexió a internet. Descarrega la comanda per conservar-la.",
-    "botonDescargar": "Descarregar Excel",
-    "descargando": "Descarregant...",
-    "descargado": "Descarregat"
-  },
-  "popupOnline": "Connexió restablerta"
+  "tituloTipos": "Tipus de Plats"
 }

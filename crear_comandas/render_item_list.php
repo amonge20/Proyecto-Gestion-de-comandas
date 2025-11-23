@@ -1,9 +1,10 @@
 <?php
 require_once '../cargar_traducciones.php';
+require_once 'render_alergenos.php'; // función para generar HTML de alérgenos
 
 function renderItemList($items, $type = 'default', $conn = null)
 {
-    $t = cargarTraducciones();
+    $traducciones = cargarTraducciones();
     $idioma = $_SESSION["idioma"] ?? "es";
 
     $html = "<div class='card-grid'>";
@@ -25,17 +26,8 @@ function renderItemList($items, $type = 'default', $conn = null)
         // Nombre según idioma
         $nombre_plato = ($idioma == "es") ? $nombre : $nombre_cat;
 
-        // Alérgenos según idioma
-        $nombre_alergeno = ($idioma == "es") ? "nombre_alergeno" : "nombre_alergeno_cat";
-
-        // Textos del JSON
-        $txt_add = $t["añadirALaLista"] ?? "Añadir a la lista";
-        $txt_ver = $t["verPlatos"] ?? "Ver platos";
-        $placeholder_icon = $t["placeholderImagen"] ?? "📷";
-        $omitibles = $t["omitirTipo"] ?? [];
-
         // Omitir tipos
-        if ($type === 'tipos' && in_array(trim($nombre_plato), $omitibles, true)) {
+        if ($type === 'tipos' && in_array(trim($nombre_plato), $traducciones['omitirTipo'], true)) {
             continue;
         }
 
@@ -47,40 +39,28 @@ function renderItemList($items, $type = 'default', $conn = null)
         if ($imagen) {
             $html .= "<img src='{$imagen}' class='card-img' alt=''>";
         } else {
-            $html .= "<div class='card-placeholder'>{$placeholder_icon}</div>";
+            $html .= "<div class='card-placeholder'>📷</div>";
         }
 
         $html .= "<div class='card-body'>";
         $html .= "<h3>{$nombre_plato}</h3>";
 
         if ($type === 'platos') {
-            $html .= "<p class='precio'><strong>{$precio} €</strong></p>";
+            $html .= "<p class='precio'><strong>{$precio}€</strong></p>";
 
-            // Alérgenos
+            // Mostrar alérgenos usando la función externa
             if (!empty($item['alergenos']) && $conn) {
                 $alergenosIds = json_decode($item['alergenos'], true);
                 if (is_array($alergenosIds) && count($alergenosIds) > 0) {
-                    $ids = implode(',', array_map('intval', $alergenosIds));
-                    $result = $conn->query("SELECT {$nombre_alergeno}, imagen_alergeno FROM alergenos WHERE id_alergeno IN ($ids)");
-                    if ($result) {
-                        $html .= "<div class='alergenos'>";
-                        while ($row = $result->fetch_assoc()) {
-                            if (!empty($row['imagen_alergeno'])) {
-                                $html .= "<img src='{$row['imagen_alergeno']}' alt='{$row[$nombre_alergeno]}' title='{$row[$nombre_alergeno]}' class='alergeno-icon'>";
-                            } else {
-                                $html .= "<span>{$row[$nombre_alergeno]}</span> ";
-                            }
-                        }
-                        $html .= "</div>";
-                    }
+                    $html .= renderAlergenos($conn, $alergenosIds);
                 }
             }
 
-            $html .= "<button class='btn-add' onclick='addToList(this)'>{$txt_add}</button>";
+            $html .= "<button class='btn-add' onclick='addToList(this)'>{$traducciones['botones']['anadirALaLista']}</button>";
         }
 
         if ($type === 'tipos') {
-            $html .= "<button class='btn' onclick='loadPlatos({$id}, \"{$nombre_plato}\")'>{$txt_ver}</button>";
+            $html .= "<button class='btn' onclick='loadPlatos({$id}, \"{$nombre_plato}\")'>{$traducciones['botones']['verPlatos']}</button>";
         }
 
         $html .= "</div></div>";

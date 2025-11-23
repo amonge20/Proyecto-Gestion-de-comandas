@@ -15,7 +15,9 @@
   "offline": {
     "titulo": "Sin conexión",
     "mensaje": "Se ha perdido la conexión a internet. Descarga la comanda para conservarla.",
-    "descargarExcel": "Descargar Excel"
+    "descargarExcel": "Descargar Excel",
+    "descargando": "Descargando...",
+    "descargado": "Descargado"
   },
   "online": {
     "reconectado": "Conexión restablecida"
@@ -32,22 +34,9 @@
     "verPlatos": "Ver platos",
     "buscarPlatos": "🔍 Buscar platos",
     "verPlatosElegidos": "Ver platos elegidos",
-    "cerrarPopup": "Cerrar",
-    "añadirExtras": "➕",
-    "eliminar": "❌"
+    "cerrarPopup": "Cerrar"
   },
-  "añadirALaLista": "Añadir a la lista",
-  "verPlatos": "Ver platos",
   "omitirTipo": ["Para añadir"],
-  "placeholderImagen": "📷",
   "mesa": "Mesa",
-  "tituloTipos": "Tipos de Platos",
-  "alertaOffline": {
-    "titulo": "Sin conexión",
-    "mensaje": "Se ha perdido la conexión a internet. Descarga la comanda para conservarla.",
-    "botonDescargar": "Descargar Excel",
-    "descargando": "Descargando...",
-    "descargado": "Descargado"
-  },
-  "popupOnline": "Conexión restablecida"
+  "tituloTipos": "Tipos de Platos"
 }
