@@ -33,7 +33,7 @@ CREATE TABLE tipos_platos (
 );
 
 INSERT INTO tipos_platos (nombre_tipo, nombre_tipo_cat, imagen_tipo) VALUES 
-('Bebidas', 'Begudes', NULL),
+('Bebidas', 'Begudes', '../images/bebidas/cocacola.png'),
 ('Para añadir', 'Per afegir', NULL),
 ('Sandwiches', 'Entrepans', NULL),
 ('Torradas', 'Torrades', NULL),
@@ -84,8 +84,19 @@ CREATE TABLE platos (
 
 /*BEBIDAS*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Coca-Cola', 'Coca-Cola', 1, NULL, NULL, 1.50),
-('Café con leche', 'Cafè amb llet', 1, '[8]', NULL, 2.00);
+('Agua', 'Aigua', 1, NULL, '../images/bebidas/agua.jpg', 1.00),
+('Cerveza', 'Cervesa', 1, NULL, '../images/bebidas/cerveza.jpg', 1.50),
+('Cerveza sin alcohol', 'Cervesa sense alcohol', 1, NULL, '../images/bebidas/cerveza-sin-alcohol.jpg', 1.50),
+('Fanta Naranja', 'Fanta Taronja', 1, NULL,  '../images/bebidas/fanta-naranja.png', 1.50),
+('Fanta Limón', 'Fanta Llimona', 1, NULL,  '../images/bebidas/fanta-limon.png', 1.50),
+('Coca-Cola', 'Coca-Cola', 1, NULL,  '../images/bebidas/cocacola.png', 1.50),
+('Coca-Cola Zero', 'Coca-Cola Zero', 1, NULL,  '../images/bebidas/cocacola-zero-azucar.png', 1.50),
+('Nestea de limón', 'Nestea de Llimona', 1, NULL, '../images/bebidas/nestea.jpg', 1.50),
+('Zumo de naranja', 'Suc de taronja', 1, NULL, '../images/bebidas/zumo-naranja.webp', 2.00),
+('Zumo de piña', 'Suc de pinya', 1, NULL, '../images/bebidas/zumo-pina.jpg', 2.00),
+('Café cortado', 'Cafè tallat', 1, '[8]', '../images/bebidas/cafe-cortado.jpg', 1.20),
+('Café solo', 'Cafè sol', 1, NULL, '../images/bebidas/cafe.jpg', 1.00),
+('Café con leche', 'Cafè amb llet', 1, '[8]', '../images/bebidas/cafe-leche.jpg', 1.50);
 
 /*PARA AÑADIR*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
@@ -113,7 +124,8 @@ INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_p
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
 ('Jamón ibérico', 'Pernil ibèric', 5, '[6,16]', NULL, 7.50),
 ('Jamón serrano', 'Pernil serrà', 5, '[6,16]', NULL, 4.00),
-('Chorizo o salchichón ibérico', 'Xoriço o salsitxa ibèrica', 5, '[6,16]', NULL, 4.00),
+('Chorizo', 'Xoriço', 5, '[6,16]', NULL, 4.00),
+('Salchichón ibérico', 'Salsitxa ibèrica', 5, '[6,16]', NULL, 4.00),
 ('Atún', 'Tonyina', 5, '[6,11]', NULL, 4.00),
 ('Queso manchego', 'Formatxe manxec', 5, '[6,8]', NULL, 4.50),
 ('Anchoas (5 filetes)', 'Anxoves (5 filets)', 5, '[6,11]', NULL, 5.00),
