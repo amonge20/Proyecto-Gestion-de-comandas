@@ -196,6 +196,7 @@ button:hover {
   overflow-y: auto;
   flex: 1;
   margin-inline: 10px;
+  margin-bottom: 12px;
 }
 
 .btn-close {

@@ -4,8 +4,8 @@ require_once '../conexion.php';
 require_once 'render_item_list.php';
 
 // Cargar traducciones
-$traducciones = cargarTraducciones();
 $_SESSION["idioma"] = $_SESSION["idioma"] ?? "es";
+$traducciones = cargarTraducciones();
 
 // Obtener lista de tipos de platos
 $query = $conn->query("SELECT * FROM tipos_platos");

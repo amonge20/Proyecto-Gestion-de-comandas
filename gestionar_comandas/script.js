@@ -29,6 +29,23 @@ function borrarComandasMesa(idMesa) {
   }).then(() => location.reload());
 }
 
+// Borrar una comanda específica
+function borrarComanda(idComanda) {
+  if (
+    !confirm(
+      "¿Seguro que quieres borrar la comanda " + idComanda + "?"
+    )
+  )
+    return;
+
+  fetch("borrar_comanda.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `id_comanda=${idComanda}`,
+  }).then(() => location.reload());
+}
+
+
 // Toggle servido/pendiente
 function activarInterruptores() {
   document.querySelectorAll(".estado-plato").forEach((span) => {

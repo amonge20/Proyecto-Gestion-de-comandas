@@ -117,50 +117,50 @@ function setCloseButtonOfLastPopupToTop() {
 }
 
 // Añadir plato o ingrediente extra según contexto
-function addToList(btn) {
-  const card = btn.closest(".card");
-  const idPlato = card.getAttribute("data-id");
-  const nombre = card.getAttribute("data-nombre");
-  const precio = parseFloat(card.getAttribute("data-precio")) || 0;
+// function addToList(btn) {
+//   const card = btn.closest(".card");
+//   const idPlato = card.getAttribute("data-id");
+//   const nombre = card.getAttribute("data-nombre");
+//   const precio = parseFloat(card.getAttribute("data-precio")) || 0;
 
-  // Si estamos en modo "añadir extra" (currentExtraTarget definido), añadimos como extra
-  if (currentExtraTarget) {
-    const target = platosElegidos.find(p => p.uniqueId === currentExtraTarget);
-    if (target) {
-      if (!Array.isArray(target.extras)) target.extras = [];
-      // extra único por selección (cantidad 1 por defecto, independiente del plato)
-      target.extras.push({
-        id: idPlato,
-        nombre,
-        precio: precio,
-        cantidad: 1  // cantidad independiente del plato principal
-      });
-      // cerrar solo la popup de extras (no la de platos elegidos)
-      closeTopPopup();
-      currentExtraTarget = null;
-      syncBackupAndUI();
-      return;
-    } else {
-      // si no existe target, limpiar modo extra
-      currentExtraTarget = null;
-    }
-  }
+//   // Si estamos en modo "añadir extra" (currentExtraTarget definido), añadimos como extra
+//   if (currentExtraTarget) {
+//     const target = platosElegidos.find(p => p.uniqueId === currentExtraTarget);
+//     if (target) {
+//       if (!Array.isArray(target.extras)) target.extras = [];
+//       // extra único por selección (cantidad 1 por defecto, independiente del plato)
+//       target.extras.push({
+//         id: idPlato,
+//         nombre,
+//         precio: precio,
+//         cantidad: 1  // cantidad independiente del plato principal
+//       });
+//       // cerrar solo la popup de extras (no la de platos elegidos)
+//       closeTopPopup();
+//       currentExtraTarget = null;
+//       syncBackupAndUI();
+//       return;
+//     } else {
+//       // si no existe target, limpiar modo extra
+//       currentExtraTarget = null;
+//     }
+//   }
 
-  // comportamiento normal: añadir plato principal
-  const uniqueId = idPlato + "-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+//   // comportamiento normal: añadir plato principal
+//   const uniqueId = idPlato + "-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
 
-  platosElegidos.push({
-    uniqueId: uniqueId,
-    id: idPlato,
-    nombre: nombre,
-    precio: precio,
-    cantidad: 1,
-    incluido: true,
-    extras: [] // array de extras asociados a este plato
-  });
+//   platosElegidos.push({
+//     uniqueId: uniqueId,
+//     id: idPlato,
+//     nombre: nombre,
+//     precio: precio,
+//     cantidad: 1,
+//     incluido: true,
+//     extras: [] // array de extras asociados a este plato
+//   });
 
-  syncBackupAndUI();
-}
+//   syncBackupAndUI();
+// }
 
 
 // cambiar cantidad de plato (incrementar/decrementar)

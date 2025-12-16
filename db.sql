@@ -34,7 +34,7 @@ CREATE TABLE tipos_platos (
 
 INSERT INTO tipos_platos (nombre_tipo, nombre_tipo_cat, imagen_tipo) VALUES 
 ('Bebidas', 'Begudes', '../images/bebidas/cocacola.png'),
-('Para añadir', 'Per afegir', NULL),
+('Para añadir', 'Per afegir', '../images/para-anadir/patatas-fritas.avif'),
 ('Sandwiches', 'Entrepans', '../images/sandwiches/bikini.jpg'),
 ('Torradas', 'Torrades', '../images/torradas/escalibada-anchoas.webp'),
 ('Bocadillos Fríos', 'Entrepans freds', '../images/bocadillos-frios/jamon.jpg'),
@@ -100,12 +100,12 @@ INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_p
 
 /*PARA AÑADIR*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
-('Queso', 'Formatge', 2, '[8]', NULL, 0.50),
-('Cebolla', 'Ceba', 2, NULL, NULL, 0.50),
-('Pimiento verde', 'Pebrot verd', 2, NULL, NULL, 0.50),
-('Bacon', 'Bacon', 2, '[16]', NULL, 1.00),
-('Huevo frito', 'Ou fregit', 2, '[7]', NULL, 1.00),
-('Patatas fritas', 'Patates fregides', 2, NULL, NULL, 1.50);
+('Queso', 'Formatge', 2, '[8]', '../images/para-anadir/queso.webp', 0.50),
+('Cebolla', 'Ceba', 2, NULL, '../images/para-anadir/cebolla.jpg', 0.50),
+('Pimiento verde', 'Pebrot verd', 2, NULL, '../images/para-anadir/pimiento-verde.jpeg', 0.50),
+('Bacon', 'Bacon', 2, '[16]', '../images/para-anadir/bacon.webp', 1.00),
+('Huevo frito', 'Ou fregit', 2, '[7]', '../images/para-anadir/huevo-frito.png', 1.00),
+('Patatas fritas', 'Patates fregides', 2, NULL, '../images/para-anadir/patatas-fritas.avif', 1.50);
 
 /*SANDWICHES*/
 INSERT INTO platos (nombre_plato, nombre_plato_cat, id_tipo, alergenos, imagen_plato, precio) VALUES
